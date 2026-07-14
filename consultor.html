@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu Desempenho — Closers Uniasselvi</title>
+<link rel="icon" type="image/png" href="Logo_Uniasselvi.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<style>
+:root {
+  --amarelo:   #FFD400;
+  --amarelo-d: #E6BE00;
+  --amarelo-g: rgba(255,212,0,.08);
+  --bg:        #0F0F0F;
+  --card:      #1A1A1A;
+  --card2:     #222222;
+  --input-bg:  #262626;
+  --borda:     #333333;
+  --borda-f:   #444444;
+  --txt:       #F0F0F0;
+  --txt2:      #999999;
+  --txt3:      #666666;
+  --verde:     #2ECC71;
+  --azul:      #3B82F6;
+  --vermelho:  #FF5555;
+  --shadow:    0 4px 32px rgba(0,0,0,.5);
+  --r:         12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { overflow-x: hidden; max-width: 100vw; }
+body { font-family: 'Nunito Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--txt); }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--card); }
+::-webkit-scrollbar-thumb { background: var(--borda-f); border-radius: 3px; }
+
+header {
+  background: #000; padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px; border-bottom: 2px solid var(--amarelo);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 14px; }
+.logo-area img { height: 36px; }
+.h-title { font-family: 'Nunito', sans-serif; color: #fff; font-size: 1.12rem; font-weight: 800; line-height: 1.2; }
+.h-sub { color: var(--amarelo); font-size: .72rem; font-weight: 700; letter-spacing: .06em; }
+.nav-links { display: flex; gap: 10px; align-items: center; }
+.nav-btn {
+  color: #000; background: var(--amarelo); border: none; border-radius: 8px;
+  padding: 8px 16px; font-family: 'Nunito', sans-serif; font-weight: 800;
+  font-size: .82rem; cursor: pointer; transition: all .2s; text-decoration: none;
+}
+.nav-btn:hover { background: var(--amarelo-d); transform: translateY(-1px); }
+.nav-btn.ghost { background: transparent; color: var(--txt2); border: 1.5px solid var(--borda-f); }
+.nav-btn.ghost:hover { border-color: var(--amarelo); color: var(--amarelo); background: var(--amarelo-g); }
+
+/* ── Seletor ── */
+#seletorSection { max-width: 560px; margin: 60px auto; padding: 0 16px; }
+.selector-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-top: 3px solid var(--amarelo); border-radius: var(--r);
+  padding: 32px 36px; box-shadow: var(--shadow);
+}
+.selector-card h2 { font-family: 'Nunito', sans-serif; font-size: 1.2rem; font-weight: 800; margin-bottom: 6px; }
+.selector-card p  { color: var(--txt2); font-size: .88rem; margin-bottom: 24px; }
+
+.mc-wrap { position: relative; margin-bottom: 16px; }
+.mc-wrap input {
+  width: 100%; padding: 12px 14px;
+  background: var(--input-bg); border: 1.5px solid var(--borda);
+  border-radius: 9px; color: var(--txt);
+  font-family: 'Nunito Sans', sans-serif; font-size: .95rem;
+  outline: none; transition: border-color .2s;
+}
+.mc-wrap input:focus { border-color: var(--amarelo); }
+.mc-drop {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--card2); border: 1.5px solid var(--borda-f);
+  border-radius: 9px; max-height: 240px; overflow-y: auto; z-index: 200; display: none;
+}
+.mc-item { padding: 11px 14px; cursor: pointer; font-size: .9rem; }
+.mc-item:hover, .mc-item.mc-active { background: var(--amarelo-g); color: var(--amarelo); }
+.mc-nenhum { padding: 11px 14px; color: var(--txt3); font-size: .88rem; }
+
+.badge-canal {
+  display: inline-block; border-radius: 20px; padding: 4px 12px;
+  font-size: .78rem; font-weight: 700; margin-bottom: 16px;
+}
+.badge-interno { background: rgba(46,204,113,.15); color: var(--verde); }
+.badge-hag     { background: rgba(59,130,246,.15);  color: var(--azul); }
+
+.btn-ver {
+  width: 100%; padding: 12px; border: none; border-radius: 9px;
+  background: var(--amarelo); color: #000;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .95rem;
+  cursor: pointer; transition: all .2s;
+}
+.btn-ver:hover { background: var(--amarelo-d); transform: translateY(-1px); }
+.btn-ver:disabled { opacity: .4; cursor: default; transform: none; }
+
+/* ── Dashboard ── */
+#telaDash { display: none; padding: 28px 32px 60px; }
+
+.update-bar { display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 20px; }
+.update-bar span { color: var(--txt3); font-size: .8rem; }
+.btn-atualizar {
+  background: var(--card2); border: 1.5px solid var(--borda-f);
+  color: var(--txt2); border-radius: 8px; padding: 7px 14px;
+  font-size: .82rem; font-weight: 700; cursor: pointer; transition: all .2s;
+}
+.btn-atualizar:hover { border-color: var(--amarelo); color: var(--amarelo); }
+
+.saudacao { margin-bottom: 24px; }
+.saudacao h2 { font-family: 'Nunito', sans-serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
+.saudacao h2 span { color: var(--amarelo); }
+.saudacao p { color: var(--txt3); font-size: .88rem; margin-top: 4px; }
+
+.filtro-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+.filtro-bar label { color: var(--txt2); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; }
+.filtro-bar input[type="date"] {
+  background: var(--input-bg); border: 1.5px solid var(--borda);
+  border-radius: 8px; padding: 8px 12px; color: var(--txt);
+  font-family: 'Nunito Sans', sans-serif; font-size: .88rem; outline: none;
+}
+.filtro-bar input[type="date"]:focus { border-color: var(--amarelo); }
+.btn-filtrar { background: var(--amarelo); color: #000; border: none; border-radius: 8px; padding: 8px 18px; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .85rem; cursor: pointer; }
+.btn-filtrar:hover { background: var(--amarelo-d); }
+.btn-limpar { background: transparent; color: var(--txt3); border: 1.5px solid var(--borda-f); border-radius: 8px; padding: 8px 14px; font-size: .85rem; cursor: pointer; }
+.btn-limpar:hover { color: var(--txt2); }
+
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+@media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+.kpi-card { background: var(--card); border: 1px solid var(--borda); border-radius: var(--r); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
+.kpi-label { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--txt2); }
+.kpi-val { font-family: 'Nunito', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; }
+.kpi-val.amarelo { color: var(--amarelo); }
+.kpi-val.verde   { color: var(--verde); }
+.kpi-val.azul    { color: var(--azul); }
+.kpi-val.vermelho{ color: var(--vermelho); }
+
+.charts-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+@media (max-width: 1100px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
+.chart-card { background: var(--card); border: 1px solid var(--borda); border-radius: var(--r); padding: 20px; }
+.chart-title { font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--txt2); margin-bottom: 14px; }
+.chart-wrap { position: relative; height: 200px; }
+
+.table-card { background: var(--card); border: 1px solid var(--borda); border-radius: var(--r); overflow: hidden; width: 100%; }
+.table-head-bar { padding: 16px 20px; background: #000; border-bottom: 2px solid var(--amarelo); display: flex; align-items: center; justify-content: space-between; }
+.table-head-bar span { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .95rem; }
+.table-count { font-size: .8rem; color: var(--txt2); }
+.table-scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+thead th { background: var(--card2); color: var(--txt2); font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--borda); white-space: nowrap; }
+tbody td { padding: 10px 12px; border-bottom: 1px solid var(--borda); color: var(--txt); vertical-align: middle; white-space: nowrap; }
+tbody tr:hover { background: rgba(255,212,0,.04); }
+.badge { display: inline-block; border-radius: 20px; padding: 3px 10px; font-size: .72rem; font-weight: 700; }
+.badge-verde    { background: rgba(46,204,113,.15);  color: var(--verde); }
+.badge-amarelo  { background: rgba(255,212,0,.15);   color: var(--amarelo); }
+.badge-vermelho { background: rgba(255,85,85,.15);   color: var(--vermelho); }
+.badge-azul     { background: rgba(59,130,246,.15);  color: var(--azul); }
+.vazio { text-align: center; padding: 40px; color: var(--txt3); font-size: .9rem; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <img src="Logo_Uniasselvi.png" alt="Uniasselvi">
+    <div>
+      <div class="h-title">Closers</div>
+      <div class="h-sub">Meu Desempenho</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <a href="index.html" class="nav-btn ghost">← Formulário</a>
+  </div>
+</header>
+
+<!-- ── Seletor de consultor ── -->
+<div id="seletorSection">
+  <div class="selector-card">
+    <h2>⭐ Área do Consultor</h2>
+    <p>Digite seu nome e selecione na lista para acessar seu painel de desempenho.</p>
+    <div class="mc-wrap">
+      <input type="text" id="mcInput" placeholder="Digite seu nome..."
+        autocomplete="off" oninput="mcFiltrar()" onfocus="mcAbrir()" onkeydown="mcNavegar(event)">
+      <div id="mcDrop" class="mc-drop"></div>
+    </div>
+    <div id="badgeCanal" style="display:none"></div>
+    <input type="hidden" id="nomeSelecionado" value="">
+    <button class="btn-ver" id="btnVer" onclick="verDesempenho()" disabled>Ver meu desempenho →</button>
+  </div>
+</div>
+
+<!-- ── Dashboard pessoal ── -->
+<div id="telaDash">
+  <div class="update-bar">
+    <span id="ultimaAtualizacao"></span>
+    <button class="btn-atualizar" onclick="carregar()">↻ Atualizar</button>
+  </div>
+  <div class="saudacao">
+    <h2>Olá, <span id="nomeConsultor"></span>!</h2>
+    <p id="subtituloSaudacao"></p>
+  </div>
+  <div class="filtro-bar">
+    <label>Período</label>
+    <label style="font-size:.82rem;color:var(--txt2);text-transform:none;letter-spacing:0">De:</label>
+    <input type="date" id="fDe">
+    <label style="font-size:.82rem;color:var(--txt2);text-transform:none;letter-spacing:0">Até:</label>
+    <input type="date" id="fAte">
+    <button class="btn-filtrar" onclick="renderizar()">Filtrar</button>
+    <button class="btn-limpar" onclick="limparFiltro()">Limpar</button>
+    <button class="btn-limpar" onclick="trocarConsultor()" style="margin-left:auto">↩ Trocar consultor</button>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Atuação de Boleto</div>
+      <div class="kpi-val amarelo" id="kTotal">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pagas</div>
+      <div class="kpi-val verde" id="kPagas">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Aguardando Pagamento</div>
+      <div class="kpi-val azul" id="kAguardando">—</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Taxa de Conversão</div>
+      <div class="kpi-val" id="kConversao">—</div>
+    </div>
+  </div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Matrículas por Mês</div>
+      <div class="chart-wrap"><canvas id="chartMes"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Status</div>
+      <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Origem</div>
+      <div class="chart-wrap"><canvas id="chartOrigem"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Modalidade</div>
+      <div class="chart-wrap"><canvas id="chartModal"></canvas></div>
+    </div>
+  </div>
+  <div class="table-card">
+    <div class="table-head-bar">
+      <span>Meus Registros</span>
+      <span class="table-count" id="tableCount"></span>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>Contrato</th><th>Data Atend.</th><th>Ticket</th>
+            <th>Origem</th><th>Modalidade</th><th>Polo</th>
+            <th>Status</th><th>Data Pagto</th><th>Auditoria</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyDados"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── Supabase (igual ao Aceleradores — funciona) ── */
+const SUPA_URL = 'https://wfequjtoutpqvfyjdrvo.supabase.co';
+const SUPA_KEY = 'sb_publishable_NYXnlMO9SZc4Sg3zxPCZtw_Uto0gecQ';
+const _db = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+/* ── Chart.js ── */
+if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+
+/* ── Mapeamento consultor → canal ── */
+const CONSULTOR_CANAL = {
+  "Adriano Reder Oliveira":"EFETIVO","Adriel Wanderlind":"EFETIVO",
+  "Adrielle Letícia Ferreira da Silva de Almeida":"EFETIVO",
+  "Alexia Tainara Taioqui Dos Santos":"HAG","Allan Karlo De Oliveira":"HAG",
+  "Amanda Cristina Soares":"EFETIVO","Amanda Das Neves Pacola":"HAG",
+  "Amanda Giraldi Arrozio":"EFETIVO","Amanda Santin Dolis":"HAG",
+  "Ana Beatriz Oliveira Rosa":"EFETIVO","Ana Caroline Cartoni Lopes":"HAG",
+  "Ana Lya De Souza Rezende":"HAG","Andrea Santos Nuevo Galan":"HAG",
+  "Anna Gabryella Nunes":"HAG","Anna Julia Barbeta De Freitas":"EFETIVO",
+  "Anna Karolina Cardoso Adriano Rosella":"HAG","Antonio Carlos Milani Nardini":"HAG",
+  "Beatriz Dos Santos Ribeiro":"HAG","Beatriz Ferrari Jordao":"EFETIVO",
+  "Bianca De Souza Pupin":"HAG","Bianca Santos Souza":"HAG",
+  "Bruna Aparecida Nogueira":"EFETIVO","Bruna Cristo Ribeiro":"EFETIVO",
+  "Bruna Martins Dias":"HAG","Bruna Siena":"HAG","Bruna Stedile Figueiredo":"EFETIVO",
+  "Camila Melo":"EFETIVO","Carina Regina Barbosa Pezini":"HAG",
+  "Cassia Leticia Oliveira Soares":"HAG","Chaiane Conceição Panian Machado":"EFETIVO",
+  "Claudia Azuaga":"HAG","Claudineia Ferreira Da Silva":"HAG",
+  "Davi Rippi Paié Verissimo De Luna":"HAG","Deyse de Andrade Landim":"EFETIVO",
+  "Elaine Fernandes Boaventura":"HAG","Elen Carolina dos Santos":"EFETIVO",
+  "Eli Pereira Primo":"HAG","Enzo Matteo Sousa De Oliveira":"HAG",
+  "Esdras Santana da Silva":"EFETIVO","Evelyn Adriana Barbosa Da Silva":"HAG",
+  "Fernanda de Souza Venancio":"EFETIVO","Flavia Cristina Dos Santos Sousa":"HAG",
+  "Gabriel Casseres Pires":"EFETIVO","Gabriel Gustavo De Oliveira Silva":"HAG",
+  "Gabriel Kauê Santos Da Silva":"HAG","Gabriel Rodrigues Alves Pereira":"HAG",
+  "Gabriela Camargo Ribeiro":"EFETIVO","Gabriela Zalasik":"EFETIVO",
+  "Geovanna Gabriely Rolim de Araujo":"HAG","Giovana Lauer Linhares":"EFETIVO",
+  "Giovani Henrique Pimenta":"EFETIVO","Giovanna Victoria dos Santos Macedo Mariano":"HAG",
+  "Gisele Cristina Florentino":"HAG","Giulia Leite Delli Colli":"EFETIVO",
+  "Gleiciane Do Nascimento Dias":"HAG","Gustavo Gonçalves Amaro":"EFETIVO",
+  "Gustavo Pivatto Cavalin":"HAG","Haillany Marinho Da Silva":"HAG",
+  "Helio Gabriel dos Santos":"HAG","Heloyse Abreu Favacho":"EFETIVO",
+  "Ingrid Aparecida dos Santos Lares da Silva":"EFETIVO","Ivan Marques Daniel":"EFETIVO",
+  "Izabela Tahisa Alves Procopio":"HAG","Jaqueline Alves Vicente":"HAG",
+  "Jefferson Andres De Souza Rozas":"HAG","Jennifer da Silva Mello":"HAG",
+  "Jheniffer do Nascimento Oliveira":"EFETIVO","Joao Victor Ribeiro de Souza":"EFETIVO",
+  "Joao Vitor Silva Ribeiro":"EFETIVO","Jonas Alves":"EFETIVO",
+  "Jose Mauro Silva de Paula":"EFETIVO","Joyce Daya Vieira":"HAG",
+  "João Elias Valero dos Santos":"EFETIVO","João Pedro Diniz de Assis":"EFETIVO",
+  "Julia Barbosa da Silva":"EFETIVO","Julia Mantovani Ferro":"EFETIVO",
+  "Juliana Rosa Marinho":"HAG","Karina Abel Marques":"HAG",
+  "Karlena Crys Ribeiro Da Silva":"HAG","Karoline Arceni Alves":"EFETIVO",
+  "Kauan Miguel Gomes Da Silva":"HAG","Kauane Candido da Silva":"EFETIVO",
+  "Kauany Yasmin Vicente Lopes":"HAG","Kauã Vinícius Muniz Pita":"HAG",
+  "Kawane Alessandra Lourenço Oliveira":"HAG","Kelly Cristina Do Amaral":"HAG",
+  "Kelly Joeisy de Lima":"EFETIVO","Larissa Silva Lage":"EFETIVO",
+  "Laura Caethane Nunes Goncalves":"EFETIVO","Laynara Luvisuto Colli Martins":"EFETIVO",
+  "Leonardo Campelo Ribeiro":"HAG","Leticia Paiva Gini":"EFETIVO",
+  "Leticia Ramos Nesta":"HAG","Lidia Venancio Moura":"HAG","Livia Kaori Matsuda":"EFETIVO",
+  "Lorena Gabrielle Leite Barbosa":"HAG","Lorraine dos Santos da Costa":"EFETIVO",
+  "Lucas Rodrigues Ueno":"HAG","Luiz Antonio Tosta Fernandes":"EFETIVO",
+  "Manuela Caetano Soria":"EFETIVO","Marcelo Martins Filho":"EFETIVO",
+  "Maria Clara Cesar Panhozzi":"EFETIVO","Maria Eduarda Dos Santos Candido":"HAG",
+  "Maria Eduarda Schamber":"EFETIVO","Maria Fernanda do Nascimento Justino":"EFETIVO",
+  "Maria Heloisa Rodrigues Pereira":"EFETIVO","Maria Vitoria Marques":"HAG",
+  "Mariana Ferreira Gomes Barbosa":"HAG","Marina Viana Angelo":"HAG",
+  "Mateus Felipe Gouveia de Souza":"EFETIVO","Matheus da Costa de Paula":"EFETIVO",
+  "Matheus Rinsi Da Silva":"HAG","Milena Da Silva Rosa":"HAG",
+  "Murilo Alexandre de Assis":"EFETIVO","Nathalia de Carvalho Cabral":"EFETIVO",
+  "Nathalia Gagliati Halchuk dos Santos":"EFETIVO","Nicole da Silva Vicente":"HAG",
+  "Nicole Ribeiro Dos Santos":"EFETIVO","Patricia Maria Devecchi":"EFETIVO",
+  "Paulo Henrique Ferreira":"EFETIVO","Paulo Parra Misak":"HAG",
+  "Paulo Ricardo Henrique De Sousa Vital":"EFETIVO","Pedro Lucas Braga Caetano":"HAG",
+  "Raabe Maristela Moreira Couto Bonfim":"HAG","Rafaela Rodrigues Mendes":"HAG",
+  "Rebeca Batista de Oliveira Santos":"EFETIVO","Rodrigo Guido Marcondes":"HAG",
+  "Rodrigo Manhani Rodrigues de Oliveira":"HAG","Roger Cauã Soares de Freitas":"EFETIVO",
+  "Rosivane Lopes de Aquino":"EFETIVO","Ruama Rosa Dos Santos Silva":"HAG",
+  "Ryan Guilherme Da Silva Rosa":"HAG","Samuel Pereira Covre":"EFETIVO",
+  "Sandoval Eduardo Nazareth Souza":"EFETIVO","Sara Camile Henrique da Silva":"EFETIVO",
+  "Sarah Gouvea dos Santos":"EFETIVO","Sthefani Cristina fava das Graças Nogueira":"EFETIVO",
+  "Talita Costa Ferreira":"HAG","Tatiana Cristina Korc":"EFETIVO",
+  "Thaina Telles Benatti":"EFETIVO","Thaisa Fernanda Tenório da Silveira Fogaça":"EFETIVO",
+  "Thalita Diandra da Silva":"EFETIVO","Thiago Lima Dos Santos":"HAG",
+  "Thiago Rinsi da Silva":"HAG","Vanderlei Rodrigues de Souza Junior":"EFETIVO",
+  "Vanessa Lemes Rodrigues":"EFETIVO","Victor Hugo dos Santos Mucenieks":"EFETIVO",
+  "Virgilia Cabral Pereira":"HAG","Vitoria De Souza Dias":"HAG",
+  "Viviane Martins De Santana Santos":"HAG","Wanessa Cristina Martinelli Camargo Da Costa":"HAG",
+  "Wellington Carlos Viana":"EFETIVO","Yara Vidal de Mattos":"EFETIVO",
+  "Yasmin dos Santos Moraes":"EFETIVO","Yasmin Rafaella Aparecida Gomes":"EFETIVO"
+};
+
+const LISTA_CONSULTORES = Object.keys(CONSULTOR_CANAL).sort();
+
+/* ── Autocomplete ── */
+let _mcAtivo = -1;
+
+function mcFiltrar() {
+  const q    = document.getElementById('mcInput').value.toLowerCase().trim();
+  const drop = document.getElementById('mcDrop');
+  _mcAtivo   = -1;
+  document.getElementById('nomeSelecionado').value = '';
+  document.getElementById('btnVer').disabled = true;
+  document.getElementById('badgeCanal').style.display = 'none';
+  if (!q) { drop.style.display = 'none'; return; }
+  const matches = LISTA_CONSULTORES.filter(n => n.toLowerCase().includes(q));
+  if (!matches.length) {
+    drop.innerHTML = '<div class="mc-nenhum">Nenhum resultado.</div>';
+  } else {
+    drop.innerHTML = matches.map(n =>
+      `<div class="mc-item" onclick="mcSelecionar('${n.replace(/'/g, "\\'")}')">${n}</div>`
+    ).join('');
+  }
+  drop.style.display = 'block';
+}
+
+function mcAbrir() {
+  const q = document.getElementById('mcInput').value.toLowerCase().trim();
+  if (!q) return;
+  mcFiltrar();
+}
+
+function mcSelecionar(nome) {
+  document.getElementById('mcInput').value        = nome;
+  document.getElementById('nomeSelecionado').value = nome;
+  document.getElementById('mcDrop').style.display  = 'none';
+  document.getElementById('btnVer').disabled        = false;
+  const canal = CONSULTOR_CANAL[nome] || 'EFETIVO';
+  const badgeEl = document.getElementById('badgeCanal');
+  if (canal === 'EFETIVO') {
+    badgeEl.innerHTML = '<span class="badge-canal badge-interno">Atendimento Interno</span>';
+  } else {
+    badgeEl.innerHTML = '<span class="badge-canal badge-hag">Atendimento HAG</span>';
+  }
+  badgeEl.style.display = 'block';
+}
+
+function mcNavegar(e) {
+  const drop  = document.getElementById('mcDrop');
+  const items = drop.querySelectorAll('.mc-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') { _mcAtivo = Math.min(_mcAtivo + 1, items.length - 1); }
+  else if (e.key === 'ArrowUp') { _mcAtivo = Math.max(_mcAtivo - 1, 0); }
+  else if (e.key === 'Enter' && _mcAtivo >= 0) { items[_mcAtivo].click(); return; }
+  else if (e.key === 'Escape') { drop.style.display = 'none'; return; }
+  items.forEach((el, i) => el.classList.toggle('mc-active', i === _mcAtivo));
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.mc-wrap')) {
+    document.getElementById('mcDrop').style.display = 'none';
+  }
+});
+
+/* ── Entrar no dashboard ── */
+let nomeAtual  = '';
+let canalAtual = '';
+let todosRegistros = [];
+let graficos = {};
+
+function verDesempenho() {
+  const nome = document.getElementById('nomeSelecionado').value.trim();
+  if (!nome) { alert('Selecione seu nome da lista antes de continuar.'); return; }
+  const canal = CONSULTOR_CANAL[nome] || 'EFETIVO';
+  nomeAtual  = nome;
+  canalAtual = canal;
+  document.getElementById('seletorSection').style.display = 'none';
+  document.getElementById('telaDash').style.display       = 'block';
+  document.getElementById('nomeConsultor').textContent    = nome.split(' ')[0];
+  const tipo = canal === 'EFETIVO' ? 'Atendimento Interno' : 'Atendimento HAG';
+  document.getElementById('subtituloSaudacao').textContent = tipo + ' — aqui está o resumo da sua performance.';
+  carregar();
+}
+
+function trocarConsultor() {
+  nomeAtual = '';
+  canalAtual = '';
+  todosRegistros = [];
+  destruirGraficos();
+  document.getElementById('mcInput').value         = '';
+  document.getElementById('nomeSelecionado').value  = '';
+  document.getElementById('btnVer').disabled         = true;
+  document.getElementById('badgeCanal').style.display = 'none';
+  document.getElementById('telaDash').style.display   = 'none';
+  document.getElementById('seletorSection').style.display = 'block';
+}
+
+/* ── Carregar dados ── */
+async function carregar() {
+  if (!nomeAtual) return;
+  document.getElementById('ultimaAtualizacao').textContent = 'Carregando...';
+  const canalAtend = canalAtual === 'EFETIVO' ? 'Interno' : 'Hag';
+  const { data, error } = await _db
+    .from('matriculas').select('*')
+    .eq('consultor', nomeAtual)
+    .eq('canal_atendimento', canalAtend)
+    .order('data_atendimento', { ascending: false });
+  if (error) {
+    document.getElementById('ultimaAtualizacao').textContent = 'Erro ao carregar dados.';
+    console.error(error);
+    return;
+  }
+  todosRegistros = data || [];
+  const agora = new Date();
+  document.getElementById('ultimaAtualizacao').textContent =
+    'Última atualização: ' + agora.toLocaleDateString('pt-BR') + ' ' +
+    agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  renderizar();
+}
+
+function getFiltrado() {
+  const de  = document.getElementById('fDe').value;
+  const ate = document.getElementById('fAte').value;
+  return todosRegistros.filter(r => {
+    if (de  && r.data_atendimento < de)  return false;
+    if (ate && r.data_atendimento > ate) return false;
+    return true;
+  });
+}
+
+function limparFiltro() {
+  document.getElementById('fDe').value = '';
+  document.getElementById('fAte').value = '';
+  renderizar();
+}
+
+function renderizar() {
+  const d = getFiltrado();
+  renderKPIs(d); renderGraficos(d); renderTabela(d);
+}
+
+/* ── KPIs ── */
+function renderKPIs(dados) {
+  const total = dados.length;
+  const pagas = dados.filter(r =>
+    r.status === 'Pago na data do vencimento' ||
+    r.status === 'Boleto Pago Antecipado' ||
+    r.status === 'Pagamento – Atrasado'
+  ).length;
+  const agu  = dados.filter(r => r.status === 'Aguardando Pagamento').length;
+  const taxa = total ? Math.round(pagas / total * 100) : 0;
+  document.getElementById('kTotal').textContent      = total;
+  document.getElementById('kPagas').textContent      = pagas;
+  document.getElementById('kAguardando').textContent = agu;
+  document.getElementById('kConversao').textContent  = taxa + '%';
+  document.getElementById('kConversao').className    = 'kpi-val ' + (taxa >= 60 ? 'verde' : taxa >= 30 ? 'amarelo' : 'vermelho');
+}
+
+/* ── Gráficos ── */
+function destruirGraficos() {
+  Object.values(graficos).forEach(g => { try { g.destroy(); } catch(e) {} });
+  graficos = {};
+}
+
+function doughnutLabels(arr) {
+  const t = arr.reduce((s, v) => s + v, 0);
+  return {
+    color: '#fff', font: { weight: 'bold', size: 11 }, textAlign: 'center',
+    formatter: v => { if (!v) return ''; return `${v}\n(${t ? Math.round(v / t * 100) : 0}%)`; },
+    display: ctx => ctx.dataset.data[ctx.dataIndex] > 0
+  };
+}
+
+function renderGraficos(dados) {
+  destruirGraficos();
+  const nomesMes = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+
+  /* Por mês */
+  const mm = {};
+  dados.forEach(r => {
+    if (!r.data_atendimento) return;
+    const k = r.data_atendimento.substring(0, 7);
+    mm[k] = (mm[k] || 0) + 1;
+  });
+  const mo = Object.keys(mm).sort();
+  graficos.mes = new Chart(document.getElementById('chartMes'), {
+    type: 'bar',
+    data: {
+      labels: mo.map(m => { const [a, n] = m.split('-'); return nomesMes[parseInt(n) - 1] + '/' + a.substring(2); }),
+      datasets: [{ data: mo.map(k => mm[k]), backgroundColor: '#FFD400', borderRadius: 6, borderSkipped: false }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, datalabels: { color: '#fff', font: { weight: 'bold', size: 11 }, anchor: 'end', align: 'top' } },
+      scales: {
+        x: { ticks: { color: '#999', font: { size: 10 } }, grid: { color: '#2a2a2a' } },
+        y: { ticks: { color: '#999', font: { size: 10 } }, grid: { color: '#2a2a2a' }, beginAtZero: true }
+      }
+    }
+  });
+
+  /* Status */
+  const sd = [
+    dados.filter(r => r.status === 'Boleto Pago Antecipado').length,
+    dados.filter(r => r.status === 'Aguardando Pagamento').length,
+    dados.filter(r => r.status === 'Pagamento – Atrasado').length,
+    dados.filter(r => r.status === 'Pago na data do vencimento').length
+  ];
+  graficos.status = new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: { labels: ['Antecipado','Aguardando','Atrasado','Pago no dia'], datasets: [{ data: sd, backgroundColor: ['#2ECC71','#3B82F6','#FF5555','#FFD400'], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#999', font: { size: 10 }, boxWidth: 10 } }, datalabels: doughnutLabels(sd) } }
+  });
+
+  /* Origem */
+  const od = [
+    dados.filter(r => r.origem_matricula === 'Contact Center').length,
+    dados.filter(r => r.origem_matricula === 'Leo App/Web').length
+  ];
+  graficos.origem = new Chart(document.getElementById('chartOrigem'), {
+    type: 'doughnut',
+    data: { labels: ['Contact Center','Leo App/Web'], datasets: [{ data: od, backgroundColor: ['#10B981','#8B5CF6'], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#999', font: { size: 10 }, boxWidth: 10 } }, datalabels: doughnutLabels(od) } }
+  });
+
+  /* Modalidade */
+  const md = [
+    dados.filter(r => r.modalidade && r.modalidade.startsWith('Graduação')).length,
+    dados.filter(r => r.modalidade && r.modalidade.includes('Pós')).length,
+    dados.filter(r => r.modalidade && r.modalidade.includes('Profiss')).length,
+    dados.filter(r => r.modalidade && r.modalidade.includes('Técnico')).length
+  ];
+  graficos.modal = new Chart(document.getElementById('chartModal'), {
+    type: 'doughnut',
+    data: { labels: ['Graduação EAD','Pós Graduação','Profissionalizante','Técnico'], datasets: [{ data: md, backgroundColor: ['#FFD400','#10B981','#8B5CF6','#F59E0B'], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#999', font: { size: 10 }, boxWidth: 10 } }, datalabels: doughnutLabels(md) } }
+  });
+}
+
+/* ── Tabela ── */
+function badgeStatus(s) {
+  if (!s) return '—';
+  if (s === 'Boleto Pago Antecipado')     return `<span class="badge badge-verde">Antecipado</span>`;
+  if (s === 'Pago na data do vencimento') return `<span class="badge badge-amarelo">Pago no dia</span>`;
+  if (s === 'Pagamento – Atrasado')       return `<span class="badge badge-vermelho">Atrasado</span>`;
+  if (s === 'Aguardando Pagamento')       return `<span class="badge badge-azul">Aguardando</span>`;
+  return s;
+}
+function badgeAud(s) {
+  if (!s) return '<span style="color:var(--txt3)">Pendente</span>';
+  if (s === 'Auditoria Feita - ok') return `<span class="badge badge-verde">Ok</span>`;
+  if (s === 'Erro')                 return `<span class="badge badge-vermelho">Erro</span>`;
+  return s;
+}
+function fmtData(d) {
+  if (!d) return '—';
+  const [a, m, dia] = d.split('-');
+  return `${dia}/${m}/${a}`;
+}
+function renderTabela(dados) {
+  const tbody = document.getElementById('tbodyDados');
+  document.getElementById('tableCount').textContent = dados.length + ' registros';
+  if (!dados.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="vazio">Nenhum registro encontrado para este período.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = dados.map((r, i) => `
+    <tr>
+      <td style="color:var(--txt3)">${i + 1}</td>
+      <td>${r.candidato || '—'}</td>
+      <td>${fmtData(r.data_atendimento)}</td>
+      <td style="color:var(--txt2)">${r.ticket || '—'}</td>
+      <td style="color:var(--txt2)">${r.origem_matricula || '—'}</td>
+      <td style="color:var(--txt2)">${r.modalidade || '—'}</td>
+      <td style="color:var(--txt2);max-width:150px;overflow:hidden;text-overflow:ellipsis">${r.polo || '—'}</td>
+      <td>${badgeStatus(r.status)}</td>
+      <td>${fmtData(r.data_pagamento)}</td>
+      <td>${badgeAud(r.status_auditoria)}</td>
+    </tr>`).join('');
+}
+</script>
+</body>
+</html>

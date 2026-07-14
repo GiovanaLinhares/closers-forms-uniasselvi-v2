@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POP-CS-004 | Manual Portal de Matrículas Uniasselvi</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Calibri', 'Arial', sans-serif; font-size: 10.5pt; color: #222; background: #fff; padding: 40px; max-width: 900px; margin: 0 auto; }
+
+  /* Cabeçalho */
+  .doc-title { text-align: center; font-size: 18pt; font-weight: bold; letter-spacing: 1px; margin-bottom: 4px; }
+  .doc-subtitle { text-align: center; font-size: 12pt; font-weight: bold; color: #1a5fa8; margin-bottom: 2px; }
+  .doc-sub2 { text-align: center; font-size: 11pt; font-weight: bold; color: #1a5fa8; margin-bottom: 28px; }
+
+  /* Seções */
+  h2 { font-size: 13pt; font-weight: bold; color: #1a5fa8; border-bottom: 2px solid #1a5fa8; padding-bottom: 4px; margin: 28px 0 12px 0; }
+  h3 { font-size: 11pt; font-weight: bold; color: #1a5fa8; margin: 18px 0 8px 0; }
+
+  p { margin-bottom: 8px; line-height: 1.5; }
+  ul { margin: 6px 0 10px 20px; }
+  ul li { margin-bottom: 4px; line-height: 1.5; }
+  ol { margin: 6px 0 10px 20px; }
+  ol li { margin-bottom: 4px; line-height: 1.5; }
+
+  /* Tabelas */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 16px 0; font-size: 10pt; }
+  thead th { background-color: #1a5fa8; color: #fff; padding: 7px 10px; text-align: left; font-weight: bold; }
+  tbody td { padding: 6px 10px; border-bottom: 1px solid #dde3ee; }
+  tbody tr:nth-child(even) { background-color: #f0f4fb; }
+  tbody tr:hover { background-color: #e4ecf8; }
+
+  /* Nota em itálico */
+  .nota { font-style: italic; color: #555; font-size: 9.5pt; margin: 8px 0 14px 0; padding: 8px 12px; background: #f7f9fc; border-left: 3px solid #aac0e0; line-height: 1.5; }
+
+  /* Código */
+  code { font-family: 'Courier New', monospace; font-size: 9pt; background: #f0f4f8; padding: 2px 6px; border-radius: 3px; }
+  pre { font-family: 'Courier New', monospace; font-size: 9pt; background: #f0f4f8; padding: 12px; border-radius: 4px; margin: 8px 0 14px 0; line-height: 1.6; overflow-x: auto; }
+
+  /* Rodapé */
+  .footer { text-align: center; font-style: italic; font-size: 9pt; color: #666; margin-top: 48px; padding-top: 16px; border-top: 1px solid #ccc; }
+
+  /* Alerta */
+  .aviso { background: #fff8e1; border-left: 4px solid #f5a623; padding: 10px 14px; margin: 10px 0 16px 0; font-size: 10pt; line-height: 1.5; }
+
+  @media print {
+    body { padding: 20px; }
+    h2 { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc-title">PROCEDIMENTO OPERACIONAL PADRÃO</div>
+<div class="doc-subtitle">Manual de Operação e Transferência de Responsabilidade</div>
+<div class="doc-sub2">Portal de Registro de Matrículas — Closers Uniasselvi</div>
+
+<!-- 1. IDENTIFICAÇÃO -->
+<h2>1. Identificação do Documento</h2>
+<table>
+  <tbody>
+    <tr><td style="width:22%;font-weight:bold">Código</td><td style="width:28%">POP-CS-004</td><td style="width:22%;font-weight:bold">Versão</td><td>1.0</td></tr>
+    <tr><td style="font-weight:bold">Nome do Processo</td><td>Manual de Operação — Portal de Matrículas Closers</td><td style="font-weight:bold">Produto</td><td>Graduação EAD</td></tr>
+    <tr><td style="font-weight:bold">Marca</td><td>Uniasselvi</td><td style="font-weight:bold">Responsável pela execução</td><td>Gestor(a) de Contact Sales</td></tr>
+    <tr><td style="font-weight:bold">Elaborado por</td><td>Kleberson Mariano</td><td style="font-weight:bold">Data</td><td>Junho / 2026</td></tr>
+    <tr><td style="font-weight:bold">Versão</td><td>1.1</td><td style="font-weight:bold">Atualizado em</td><td>Junho / 2026 — Inclusão da Área do Consultor</td></tr>
+  </tbody>
+</table>
+
+<!-- 2. VISÃO GERAL -->
+<h2>2. Visão Geral do Sistema</h2>
+<p>O Portal de Registro de Matrículas é um sistema web para registro e acompanhamento de matrículas operadas pela equipe Closers da Uniasselvi, contemplando consultores internos (EFETIVO) e externos (HAG).</p>
+
+<h3>2.1. Quem utiliza o sistema</h3>
+<ul>
+  <li><strong>Consultores</strong> — preenchem o formulário de registro a cada matrícula realizada.</li>
+  <li><strong>Gestores e Analistas</strong> — acessam o dashboard para acompanhar indicadores, auditar e alterar status.</li>
+</ul>
+
+<h3>2.2. Composição do sistema</h3>
+<p>O sistema é composto por <strong>três arquivos HTML independentes</strong>, hospedados no GitHub Pages. Não há servidor próprio — toda a lógica roda no navegador do usuário e os dados ficam armazenados no Supabase (banco PostgreSQL gerenciado na nuvem).</p>
+
+<h3>2.3. Arquitetura</h3>
+<table>
+  <thead><tr><th>Componente</th><th>Tecnologia</th><th>Função</th></tr></thead>
+  <tbody>
+    <tr><td>Formulário de registro</td><td>HTML5 / CSS3 / JavaScript</td><td>index.html — consultores registram matrículas</td></tr>
+    <tr><td>Painel analítico</td><td>HTML5 / CSS3 / JavaScript + Chart.js 4</td><td>dashboard.html — gestores acompanham indicadores</td></tr>
+    <tr><td>Área do Consultor</td><td>HTML5 / CSS3 / JavaScript + Chart.js 4</td><td>consultor.html — cada consultor vê o próprio desempenho</td></tr>
+    <tr><td>Banco de dados</td><td>Supabase (PostgreSQL gerenciado)</td><td>Armazenamento permanente de todos os registros</td></tr>
+    <tr><td>API de dados</td><td>Supabase REST API (PostgREST)</td><td>Comunicação entre o navegador e o banco</td></tr>
+    <tr><td>Hospedagem</td><td>GitHub Pages (gratuito)</td><td>Publicação das páginas HTML</td></tr>
+  </tbody>
+</table>
+<div class="nota">Nota: A aplicação é intencionalmente 100% estática: zero custo de servidor e zero manutenção de infraestrutura. A segurança de escrita é controlada via RLS (Row Level Security) no Supabase.</div>
+
+<!-- 3. ACESSOS E CREDENCIAIS -->
+<h2>3. Acessos e Credenciais</h2>
+
+<h3>3.1. URLs públicas</h3>
+<table>
+  <thead><tr><th>Página</th><th>URL</th></tr></thead>
+  <tbody>
+    <tr><td>Formulário de registro</td><td>https://vitrucontactsales.github.io/closers-forms-uniasselvi/</td></tr>
+    <tr><td>Painel analítico (Dashboard)</td><td>https://vitrucontactsales.github.io/closers-forms-uniasselvi/dashboard.html</td></tr>
+    <tr><td>Área do Consultor</td><td>https://vitrucontactsales.github.io/closers-forms-uniasselvi/consultor.html</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2. Senhas do sistema</h3>
+<table>
+  <thead><tr><th>Acesso</th><th>Senha</th><th>Mecanismo</th></tr></thead>
+  <tbody>
+    <tr><td>Dashboard (painel analítico)</td><td>Uni@sselvi@2026</td><td>sessionStorage — chave: dash_auth = '1'</td></tr>
+    <tr><td>Cadastrar Colaborador (formulário)</td><td>Uni@sselvi@2026</td><td>sessionStorage — mesmo mecanismo</td></tr>
+  </tbody>
+</table>
+<div class="nota">Nota: A autenticação é verificada no navegador via hash SHA-256 — a senha não aparece em texto puro no código. Ao fechar a aba, a sessão é encerrada. Para alterar a senha, é necessário gerar um novo hash SHA-256 da nova senha e substituir a constante <code>SENHA_HASH</code> em index.html. Recomenda-se usar o Claude Code para fazer essa alteração com segurança.</div>
+
+<h3>3.3. Acesso ao Supabase (banco de dados)</h3>
+<table>
+  <thead><tr><th>Item</th><th>Valor</th></tr></thead>
+  <tbody>
+    <tr><td>Projeto</td><td>closers-uniasselvi</td></tr>
+    <tr><td>URL do projeto</td><td>https://wfequjtoutpqvfyjdrvo.supabase.co</td></tr>
+    <tr><td>Chave pública (anon key)</td><td>sb_publishable_NYXnlMO9SZc4Sg3zxPCZtw_Uto0gecQ</td></tr>
+    <tr><td>Console web</td><td>https://supabase.com → login com as credenciais abaixo</td></tr>
+    <tr><td>Login (e-mail)</td><td>kleberson.azevedo@vitru.com.br</td></tr>
+    <tr><td>Senha da conta</td><td>Cri@tur@1</td></tr>
+    <tr><td>Senha do banco de dados</td><td>Makikilu2026</td></tr>
+  </tbody>
+</table>
+<div class="aviso"><strong>Importante:</strong> Transferir o acesso ao Supabase para a pessoa responsável assim que possível. Acessar supabase.com → Organization Settings → Members → Invite → adicionar o e-mail do novo responsável como Owner. Após confirmação, remover o e-mail anterior.</div>
+<div class="nota">Nota: A anon key é pública e pode aparecer no código HTML. As permissões de acesso são controladas pelas políticas RLS no banco — ela permite apenas SELECT, INSERT e UPDATE na tabela <code>matriculas</code>.</div>
+
+<h3>3.4. GitHub (repositório de código)</h3>
+<table>
+  <thead><tr><th>Item</th><th>Valor</th></tr></thead>
+  <tbody>
+    <tr><td>Organização / Conta</td><td>vitrucontactSales</td></tr>
+    <tr><td>Repositório</td><td>vitrucontactSales/closers-forms-uniasselvi</td></tr>
+    <tr><td>Branch principal</td><td>main</td></tr>
+    <tr><td>GitHub Pages</td><td>Ativo — branch main, raiz do repositório</td></tr>
+    <tr><td>Login (e-mail)</td><td>kleberson.azevedo@vitru.com.br</td></tr>
+    <tr><td>Senha</td><td>Cri@tur@1</td></tr>
+  </tbody>
+</table>
+
+<!-- 4. FORMULÁRIO -->
+<h2>4. Formulário de Registro (index.html)</h2>
+<p>Permite que consultores registrem cada matrícula em tempo real. O registro é salvo diretamente no banco Supabase ao clicar em "Registrar Matrícula".</p>
+
+<h3>4.1. Campos do formulário</h3>
+<table>
+  <thead><tr><th>#</th><th>Campo</th><th>Tipo</th><th>Obrigatório</th><th>Observações</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Origem da Matrícula</td><td>Select</td><td>Sim</td><td>Contact Center / Leo App/Web / Polo / Externo</td></tr>
+    <tr><td>2</td><td>Nome do(a) Consultor(a)</td><td>Autocomplete</td><td>Sim</td><td>159 nomes da base oficial — busca por digitação. Exibe badge Interno ou HAG ao selecionar</td></tr>
+    <tr><td>3</td><td>Número do Contrato</td><td>Text</td><td>Sim</td><td>Apenas dígitos — letras e símbolos são bloqueados</td></tr>
+    <tr><td>4</td><td>Data do Atendimento</td><td>Date</td><td>Sim</td><td>—</td></tr>
+    <tr><td>5</td><td>Ticket</td><td>Text</td><td>Sim</td><td>Campo livre (ex.: TKT-12345)</td></tr>
+    <tr><td>6</td><td>Modalidade de Curso</td><td>Select</td><td>Sim</td><td>Graduação EAD / Ed. Continuada</td></tr>
+    <tr><td>6b</td><td>Tipo de Ed. Continuada</td><td>Select</td><td>Condicional</td><td>Aparece apenas quando Ed. Continuada é selecionada: Pós Graduação / Profissionalizante / Técnico</td></tr>
+    <tr><td>7</td><td>Gestor(a)</td><td>Select</td><td>Sim</td><td>Beatriz Ferrari Jordão / Sandoval Eduardo Nazareth Souza</td></tr>
+    <tr><td>8</td><td>Polo</td><td>Autocomplete</td><td>Sim</td><td>Centenas de polos — busca por digitação</td></tr>
+    <tr><td>9</td><td>Status</td><td>Select</td><td>Sim</td><td>Aguardando Pagamento / Boleto Pago Antecipado</td></tr>
+    <tr><td>9b</td><td>Data do Pagamento</td><td>Date</td><td>Condicional</td><td>Aparece quando Status indica pagamento. Label muda conforme status</td></tr>
+    <tr><td>10</td><td>Observações</td><td>Textarea</td><td>Não</td><td>Campo livre</td></tr>
+  </tbody>
+</table>
+
+<h3>4.2. Regras de negócio do formulário</h3>
+<ul>
+  <li><strong>Canal derivado automaticamente:</strong> ao selecionar o consultor, o sistema identifica se é Interno (EFETIVO) ou HAG com base no domínio do e-mail cadastrado. Um badge colorido é exibido abaixo do campo.</li>
+  <li><strong>Verificação de duplicata:</strong> ao sair do campo Número do Contrato, o sistema verifica se o contrato já foi registrado no banco.</li>
+  <li><strong>Regra do dia 10:</strong> todo boleto vence no dia 10 de cada mês. Pago antes = Antecipado. Pago após = Atrasado (ajuste feito pelo analista no dashboard).</li>
+  <li><strong>Polo e Consultor obrigatórios via lista:</strong> digitação livre não é aceita — o usuário deve selecionar da lista de autocomplete.</li>
+</ul>
+
+<h3>4.3. Fluxo de envio</h3>
+<ol>
+  <li>O JavaScript coleta os valores dos campos do formulário.</li>
+  <li>Deriva automaticamente o canal de atendimento (Interno / Hag) a partir do consultor selecionado.</li>
+  <li>Verifica duplicata de contrato no Supabase antes de salvar.</li>
+  <li>Envia via requisição POST para a API REST do Supabase.</li>
+  <li>Se bem-sucedido: exibe mensagem de sucesso e limpa o formulário.</li>
+  <li>Se erro: exibe mensagem de erro com detalhes do problema.</li>
+</ol>
+
+<h3>4.4. Cadastrar Novo Colaborador</h3>
+<p>O formulário possui um modal de cadastro de colaborador (protegido pela mesma senha do dashboard). Ao cadastrar, o colaborador é salvo na tabela <code>colaboradores</code> no Supabase e fica disponível imediatamente no autocomplete do formulário sem necessidade de atualização do código.</p>
+<div class="nota">Nota: Para que o colaborador seja classificado como Interno ou HAG, o sistema verifica o domínio do e-mail cadastrado. Domínios @uniasselvi, @unicesumar e @vitru = EFETIVO (Interno). Qualquer outro domínio = HAG.</div>
+
+<!-- 5. DASHBOARD -->
+<h2>5. Painel de Gestão (dashboard.html)</h2>
+
+<h3>5.1. Como acessar</h3>
+<ol>
+  <li>Abrir: <code>https://vitrucontactsales.github.io/closers-forms-uniasselvi/dashboard.html</code></li>
+  <li>Inserir a senha: <strong>Uni@sselvi@2026</strong></li>
+  <li>O painel carrega automaticamente todos os dados do Supabase.</li>
+</ol>
+
+<h3>5.2. KPIs</h3>
+<table>
+  <thead><tr><th>Indicador</th><th>Descrição</th></tr></thead>
+  <tbody>
+    <tr><td>Atuação de Boleto</td><td>Total de matrículas registradas (com os filtros aplicados)</td></tr>
+    <tr><td>Pagas</td><td>Registros com qualquer status de pagamento efetivo</td></tr>
+    <tr><td>Aguardando Pagamento</td><td>Registros ainda sem pagamento confirmado</td></tr>
+    <tr><td>Taxa de Conversão</td><td>% de matrículas pagas sobre o total</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3. Filtros disponíveis</h3>
+<table>
+  <thead><tr><th>Filtro</th><th>Comportamento</th></tr></thead>
+  <tbody>
+    <tr><td>Gestor(a)</td><td>Filtra por supervisor responsável</td></tr>
+    <tr><td>Consultor(a)</td><td>Campo de busca com autocomplete</td></tr>
+    <tr><td>Status</td><td>Todos os status disponíveis</td></tr>
+    <tr><td>Canal</td><td>Interno / Hag</td></tr>
+    <tr><td>Modalidade</td><td>Graduação EAD / Ed. Continuada e subtipos</td></tr>
+    <tr><td>Origem</td><td>Contact Center / Leo App/Web / Polo / Externo</td></tr>
+    <tr><td>Período De/Até</td><td>Filtra pela data do atendimento</td></tr>
+  </tbody>
+</table>
+
+<h3>5.4. Gráficos</h3>
+<table>
+  <thead><tr><th>Gráfico</th><th>Tipo</th><th>Lógica</th></tr></thead>
+  <tbody>
+    <tr><td>Matrículas por Consultor</td><td>Barras horizontais</td><td>Top 15 consultores com mais registros</td></tr>
+    <tr><td>Interno vs HAG</td><td>Rosca</td><td>Distribuição entre consultores internos e HAG</td></tr>
+    <tr><td>Distribuição por Status</td><td>Rosca</td><td>4 categorias: Antecipado / Aguardando / Atrasado / Pago</td></tr>
+    <tr><td>Origem da Matrícula</td><td>Rosca</td><td>Contact Center / Leo App/Web / Polo / Externo</td></tr>
+  </tbody>
+</table>
+<div class="nota">Nota: Os gráficos de rosca exibem rótulos fixos nas fatias (valor absoluto + percentual) via chartjs-plugin-datalabels. Todos os gráficos respondem aos filtros aplicados.</div>
+
+<h3>5.5. Tabela de Registros</h3>
+<p>A tabela exibe todos os registros com os filtros aplicados (14 colunas). Os seguintes campos são editáveis diretamente na tabela pelo analista:</p>
+<table>
+  <thead><tr><th>Campo editável</th><th>Opções</th><th>Comportamento</th></tr></thead>
+  <tbody>
+    <tr><td>Origem</td><td>Contact Center / Leo App/Web / Polo / Externo</td><td>Salva no Supabase imediatamente ao alterar. Atualiza gráficos.</td></tr>
+    <tr><td>Status</td><td>Aguardando Pagamento / Pago na data do vencimento / Boleto Pago Antecipado / Pagamento – Atrasado</td><td>Salva no Supabase imediatamente. Exibe/oculta campo de data.</td></tr>
+    <tr><td>Data Pagamento</td><td>Campo de data</td><td>Aparece para qualquer status de pagamento efetivo. Limpa ao voltar para Aguardando Pagamento.</td></tr>
+    <tr><td>Auditoria</td><td>— Pendente — / Auditoria Feita - ok / Erro</td><td>Ao selecionar Erro, exibe campo de observação abaixo do select.</td></tr>
+  </tbody>
+</table>
+
+<h3>5.6. Barra de atualização</h3>
+<p>No topo do conteúdo, alinhada à direita, exibe o timestamp da última carga de dados e um botão <strong>↻ Atualizar</strong> que recarrega todos os dados do Supabase sem recarregar a página.</p>
+
+<h3>5.7. Exportar CSV</h3>
+<p>Botão no header exporta todos os registros filtrados com todos os campos disponíveis em formato CSV, incluindo: Origem, Canal Consultor, Auditoria e Obs. Auditoria.</p>
+
+<!-- 6. ÁREA DO CONSULTOR -->
+<h2>6. Área do Consultor (consultor.html)</h2>
+<p>Painel de desempenho individual para cada consultor da equipe Closers. Permite que o consultor acompanhe somente os próprios resultados, sem visualizar dados de outros colegas. A página não tem senha — o acesso é aberto, mas os dados exibidos são filtrados pelo nome selecionado.</p>
+
+<h3>6.1. Como acessar</h3>
+<ol>
+  <li>No formulário principal (<code>index.html</code>), clicar no botão <strong>⭐ Área do Consultor</strong> no canto superior direito.</li>
+  <li>Na página que abrir, digitar o nome no campo de busca e selecionar na lista.</li>
+  <li>Um badge aparece indicando automaticamente se é <em>Atendimento Interno</em> ou <em>Atendimento HAG</em>.</li>
+  <li>Clicar em <strong>Ver meu desempenho →</strong>.</li>
+  <li>O dashboard carrega com os dados exclusivos do consultor selecionado.</li>
+</ol>
+<div class="nota">Nota: Para trocar de consultor sem sair da página, usar o botão "↩ Trocar consultor" que aparece na barra de filtros após carregar o dashboard.</div>
+
+<h3>6.2. Isolamento de dados</h3>
+<p>Os dados de consultores Internos (EFETIVO) e HAG são completamente isolados entre si. O sistema filtra os registros por <strong>nome do consultor</strong> e <strong>canal de atendimento</strong> simultaneamente, garantindo que um consultor interno não veja registros HAG e vice-versa.</p>
+
+<h3>6.3. KPIs disponíveis</h3>
+<table>
+  <thead><tr><th>Indicador</th><th>Descrição</th></tr></thead>
+  <tbody>
+    <tr><td>Atuação de Boleto</td><td>Total de matrículas registradas pelo consultor</td></tr>
+    <tr><td>Pagas</td><td>Registros com qualquer status de pagamento efetivo</td></tr>
+    <tr><td>Aguardando Pagamento</td><td>Registros ainda sem pagamento confirmado</td></tr>
+    <tr><td>Taxa de Conversão</td><td>% de matrículas pagas sobre o total</td></tr>
+  </tbody>
+</table>
+
+<h3>6.4. Gráficos disponíveis</h3>
+<table>
+  <thead><tr><th>Gráfico</th><th>Tipo</th><th>O que mostra</th></tr></thead>
+  <tbody>
+    <tr><td>Matrículas por Mês</td><td>Barras verticais</td><td>Distribuição mensal das matrículas do consultor</td></tr>
+    <tr><td>Status</td><td>Rosca</td><td>Proporção por status de pagamento (Antecipado / Aguardando / Atrasado / Pago)</td></tr>
+    <tr><td>Origem</td><td>Rosca</td><td>Contact Center vs Leo App/Web</td></tr>
+    <tr><td>Modalidade</td><td>Rosca</td><td>Graduação EAD / Pós Graduação / Profissionalizante / Técnico</td></tr>
+  </tbody>
+</table>
+
+<h3>6.5. Filtro de período</h3>
+<p>O consultor pode filtrar os dados por intervalo de datas (campos <em>De</em> e <em>Até</em>). Clicar em <strong>Filtrar</strong> para aplicar. Clicar em <strong>Limpar</strong> para remover o filtro e ver todos os registros.</p>
+
+<h3>6.6. Tabela de registros</h3>
+<p>Exibe todos os registros do consultor com os seguintes campos (somente leitura — não há edição disponível na Área do Consultor):</p>
+<ul>
+  <li>#, Contrato, Data Atend., Ticket, Origem, Modalidade, Polo, Status, Data Pagto, Auditoria</li>
+</ul>
+<div class="nota">Nota: A coluna Auditoria mostra o resultado da revisão feita pelos analistas no dashboard — <em>Ok</em>, <em>Erro</em> ou <em>Pendente</em>.</div>
+
+<h3>6.7. Permissões</h3>
+<table>
+  <thead><tr><th>Ação</th><th>Disponível na Área do Consultor?</th></tr></thead>
+  <tbody>
+    <tr><td>Visualizar os próprios registros</td><td>Sim</td></tr>
+    <tr><td>Filtrar por período</td><td>Sim</td></tr>
+    <tr><td>Ver KPIs e gráficos</td><td>Sim</td></tr>
+    <tr><td>Editar status ou auditoria</td><td>Não — apenas gestores/analistas no dashboard</td></tr>
+    <tr><td>Ver registros de outros consultores</td><td>Não — isolamento total por consultor</td></tr>
+    <tr><td>Exportar dados</td><td>Não — exportação disponível apenas no dashboard</td></tr>
+  </tbody>
+</table>
+
+<!-- 7. BANCO DE DADOS -->
+<h2>7. Banco de Dados — Supabase</h2>
+
+<h3>7.1. Estrutura da tabela <code>matriculas</code></h3>
+<table>
+  <thead><tr><th>Coluna</th><th>Tipo</th><th>Obrigatório</th><th>Descrição</th></tr></thead>
+  <tbody>
+    <tr><td>id</td><td>uuid</td><td>Sim (auto)</td><td>Chave primária gerada automaticamente pelo Supabase</td></tr>
+    <tr><td>origem_matricula</td><td>text</td><td>Não</td><td>Contact Center / Leo App/Web / Polo / Externo</td></tr>
+    <tr><td>consultor</td><td>text</td><td>Sim</td><td>Nome do(a) consultor(a)</td></tr>
+    <tr><td>canal_consultor</td><td>text</td><td>Não</td><td>Interno / HAG — derivado da base de colaboradores</td></tr>
+    <tr><td>candidato</td><td>text</td><td>Sim</td><td>Número do contrato (apenas dígitos)</td></tr>
+    <tr><td>data_atendimento</td><td>date</td><td>Sim</td><td>Data do atendimento</td></tr>
+    <tr><td>ticket</td><td>text</td><td>Sim</td><td>Número do ticket</td></tr>
+    <tr><td>canal_atendimento</td><td>text</td><td>Não</td><td>Interno / Hag — derivado automaticamente do consultor</td></tr>
+    <tr><td>modalidade</td><td>text</td><td>Sim</td><td>Graduação EAD / Ed. Continuada — subtipo</td></tr>
+    <tr><td>gestor</td><td>text</td><td>Sim</td><td>Nome do(a) supervisor(a)</td></tr>
+    <tr><td>polo</td><td>text</td><td>Sim</td><td>Polo selecionado</td></tr>
+    <tr><td>status</td><td>text</td><td>Sim</td><td>Ver valores possíveis abaixo</td></tr>
+    <tr><td>data_pagamento</td><td>date</td><td>Não</td><td>Preenchida quando status indica pagamento</td></tr>
+    <tr><td>observacoes</td><td>text</td><td>Não</td><td>Campo livre</td></tr>
+    <tr><td>status_auditoria</td><td>text</td><td>Não</td><td>Auditoria Feita - ok / Erro / null (pendente)</td></tr>
+    <tr><td>obs_auditoria</td><td>text</td><td>Não</td><td>Motivo do erro (preenchido quando status_auditoria = Erro)</td></tr>
+    <tr><td>registrado_em</td><td>text</td><td>Sim (auto)</td><td>Timestamp gerado no front-end no momento do registro</td></tr>
+  </tbody>
+</table>
+<div class="nota">Nota: A coluna <code>id</code> é do tipo UUID — nunca converter com Number(). Usar sempre como string.</div>
+
+<h3>7.2. Valores possíveis para <code>status</code></h3>
+<table>
+  <thead><tr><th>Valor</th><th>Quem define</th><th>Momento</th></tr></thead>
+  <tbody>
+    <tr><td>Aguardando Pagamento</td><td>Consultor (formulário)</td><td>Registro inicial</td></tr>
+    <tr><td>Boleto Pago Antecipado</td><td>Consultor (formulário)</td><td>Pagamento antes do dia 10</td></tr>
+    <tr><td>Pago na data do vencimento</td><td>Analista (dashboard)</td><td>Pagamento no dia 10</td></tr>
+    <tr><td>Pagamento – Atrasado</td><td>Analista (dashboard)</td><td>Pagamento após o dia 10</td></tr>
+  </tbody>
+</table>
+<div class="nota">Regra de negócio: todo boleto vence no dia 10 de cada mês. Pago antes do dia 10 = Antecipado. Pago após o dia 10 = Atrasado.</div>
+
+<h3>7.3. Estrutura da tabela <code>colaboradores</code></h3>
+<table>
+  <thead><tr><th>Coluna</th><th>Tipo</th><th>Descrição</th></tr></thead>
+  <tbody>
+    <tr><td>nome</td><td>text</td><td>Nome completo do colaborador</td></tr>
+    <tr><td>email</td><td>text</td><td>E-mail corporativo — usado para classificar Interno ou HAG</td></tr>
+    <tr><td>matricula</td><td>text</td><td>Número de matrícula</td></tr>
+    <tr><td>gestor</td><td>text</td><td>Nome do supervisor imediato</td></tr>
+    <tr><td>data_admissao</td><td>date</td><td>Data de admissão</td></tr>
+    <tr><td>canal</td><td>text</td><td>EFETIVO ou HAG</td></tr>
+  </tbody>
+</table>
+
+<h3>7.4. Políticas de segurança (RLS)</h3>
+<table>
+  <thead><tr><th>Política</th><th>Operação</th><th>Quem pode</th><th>Necessária para</th></tr></thead>
+  <tbody>
+    <tr><td>allow_select_matriculas</td><td>SELECT</td><td>anon (público)</td><td>Dashboard e formulário lerem os dados</td></tr>
+    <tr><td>allow_insert_matriculas</td><td>INSERT</td><td>anon (público)</td><td>Formulário registrar novas matrículas</td></tr>
+    <tr><td>allow_update_matriculas</td><td>UPDATE</td><td>anon (público)</td><td>Edição inline de status/auditoria no dashboard</td></tr>
+  </tbody>
+</table>
+
+<h3>7.5. Como acessar o banco diretamente</h3>
+<ol>
+  <li>Acessar <code>https://supabase.com</code> e fazer login com as credenciais da seção 3.3.</li>
+  <li>Selecionar o projeto <strong>closers-uniasselvi</strong>.</li>
+  <li><strong>Table Editor:</strong> ver e editar registros diretamente.</li>
+  <li><strong>SQL Editor:</strong> executar queries personalizadas.</li>
+</ol>
+
+<!-- 7. BASE DE COLABORADORES -->
+<h2>8. Base de Colaboradores</h2>
+<p>A base oficial de colaboradores está no arquivo <code>Base_Colaboradores_Uniasselvi.xlsx</code> (planilha <code>FATO_COLABORADORES</code>). Atualmente com 159 colaboradores entre EFETIVO e HAG.</p>
+
+<h3>8.1. Regra de classificação Interno vs HAG</h3>
+<p>A classificação é feita com base no <strong>domínio do e-mail</strong> (<code>DS_EMAIL</code> na planilha):</p>
+<table>
+  <thead><tr><th>Domínio do e-mail</th><th>Classificação</th><th>Canal</th></tr></thead>
+  <tbody>
+    <tr><td>@uniasselvi.com.br</td><td>EFETIVO</td><td>Interno</td></tr>
+    <tr><td>@unicesumar.edu.br</td><td>EFETIVO</td><td>Interno</td></tr>
+    <tr><td>@vitru.com.br</td><td>EFETIVO</td><td>Interno</td></tr>
+    <tr><td>Qualquer outro domínio</td><td>HAG</td><td>Hag</td></tr>
+  </tbody>
+</table>
+<div class="nota">Nota: A coluna <code>DS_CONTRATO</code> da planilha pode estar em branco para novos colaboradores — não usar como critério de classificação.</div>
+
+<h3>8.2. Atualizar a lista de consultores no formulário</h3>
+<p>A lista de consultores no formulário está hardcoded em duas estruturas JS dentro do <code>index.html</code>:</p>
+<ul>
+  <li><code>LISTA_CONSULTORES</code> — array com os nomes em ordem alfabética</li>
+  <li><code>CONSULTOR_CANAL</code> — objeto mapeando cada nome para "EFETIVO" ou "HAG"</li>
+</ul>
+<p>Ao receber uma nova base de colaboradores, abrir o projeto no <strong>Claude Code</strong> e informar o novo arquivo Excel. O Claude lê o arquivo, identifica os novos colaboradores, classifica pelo domínio do e-mail e insere nas duas estruturas automaticamente.</p>
+<div class="nota">Nota: Novos colaboradores cadastrados pelo modal do formulário são salvos na tabela <code>colaboradores</code> no Supabase e ficam disponíveis imediatamente — sem necessidade de editar o código.</div>
+
+<!-- 8. MANUTENÇÃO -->
+<h2>9. Manutenção do Sistema</h2>
+
+<h3>9.1. Como abrir o projeto no Claude Code</h3>
+<p>Todas as tarefas de manutenção descritas nesta seção são realizadas com o auxílio do <strong>Claude Code</strong> — uma ferramenta de IA que lê o projeto e faz as alterações para você, sem precisar entender código. Para que o Claude funcione corretamente, ele precisa ser aberto dentro da pasta certa do projeto.</p>
+
+<p><strong>Passo a passo para abrir o projeto:</strong></p>
+<ol>
+  <li>Abra o <strong>Visual Studio Code</strong> (VS Code) no seu computador.</li>
+  <li>No menu superior, clique em <strong>Arquivo</strong> → <strong>Abrir Pasta</strong>.</li>
+  <li>Navegue até a pasta do projeto:<br>
+    <code>OneDrive → Documentos → Projetos_BI → Projetos_BI_Uniassalvi → Formulario_Closers_Uniasselvi</code>
+  </li>
+  <li>Clique em <strong>Selecionar Pasta</strong>.</li>
+  <li>Com a pasta aberta, pressione as teclas <strong>Ctrl + Shift + P</strong> ao mesmo tempo.</li>
+  <li>Na caixa que aparecer, digite <strong>Claude</strong> e selecione a opção <strong>"Claude: Open Claude Code"</strong> (ou clique no ícone do Claude na barra lateral esquerda).</li>
+  <li>O Claude Code abrirá um painel de conversa. Ele lê automaticamente o arquivo <code>CLAUDE.md</code> que está na pasta — esse arquivo contém todo o contexto do projeto, então o Claude já sabe como o sistema funciona.</li>
+  <li>Basta digitar o que você precisa em português e enviar. Exemplos:
+    <ul>
+      <li><em>"Preciso adicionar um novo consultor chamado João Silva com e-mail joao@vitru.com.br"</em></li>
+      <li><em>"Preciso alterar a senha do sistema"</em></li>
+      <li><em>"Recebi uma nova base de colaboradores, como atualizo?"</em></li>
+    </ul>
+  </li>
+</ol>
+<div class="nota">Nota: O Claude Code lê o arquivo CLAUDE.md automaticamente sempre que a pasta do projeto está aberta. Esse arquivo funciona como um "manual técnico interno" que explica toda a estrutura do sistema para a IA — por isso não deve ser apagado ou movido.</div>
+<div class="aviso"><strong>Importante:</strong> Abra sempre a pasta <code>Formulario_Closers_Uniasselvi</code> diretamente, não uma pasta pai (como Projetos_BI). Se outra pasta estiver aberta, o Claude não vai carregar o contexto correto do projeto.</div>
+
+<h3>9.2. Alterar a senha do sistema</h3>
+<ol>
+  <li>Abrir o projeto no Claude Code (ver seção 9.1).</li>
+  <li>Informar: "preciso alterar a senha para [nova senha]".</li>
+  <li>O Claude gera o hash SHA-256 da nova senha e substitui a constante <code>SENHA_HASH</code> no <code>index.html</code> automaticamente.</li>
+  <li>Publicar no GitHub Pages (ver seção 10).</li>
+</ol>
+<div class="nota">Nota: A senha nunca aparece em texto puro no código — apenas o hash SHA-256 é armazenado. Não é necessário editar o código manualmente.</div>
+
+<h3>9.3. Adicionar ou atualizar colaboradores em massa</h3>
+<ol>
+  <li>Receber o arquivo <code>Base_Colaboradores_Uniasselvi.xlsx</code> atualizado.</li>
+  <li>Abrir o projeto no Claude Code (ver seção 9.1).</li>
+  <li>Informar: "atualizei a base de colaboradores" e indicar o caminho do arquivo.</li>
+  <li>O Claude lê o Excel, identifica novos colaboradores, classifica pelo domínio do e-mail e atualiza o código automaticamente.</li>
+  <li>Publicar no GitHub Pages (ver seção 10).</li>
+</ol>
+
+<h3>9.4. Adicionar gestores ao formulário</h3>
+<ol>
+  <li>Abrir o projeto no Claude Code (ver seção 9.1).</li>
+  <li>Informar: "preciso adicionar o gestor [Nome Completo] ao formulário".</li>
+  <li>O Claude localiza e atualiza o campo automaticamente.</li>
+  <li>Publicar no GitHub Pages (ver seção 10).</li>
+</ol>
+
+<h3>9.5. Corrigir status de registros em massa via SQL</h3>
+<p>Acessar o SQL Editor no Supabase e executar uma query UPDATE. Exemplo:</p>
+<pre>UPDATE matriculas
+SET status = 'Pago na data do vencimento'
+WHERE consultor = 'Nome do Consultor'
+  AND data_atendimento >= '2026-06-01';</pre>
+
+<h3>9.6. Adicionar nova origem ao formulário</h3>
+<ol>
+  <li>Abrir <code>index.html</code> e localizar <code>&lt;select id="origemMatricula"&gt;</code>.</li>
+  <li>Adicionar a opção desejada.</li>
+  <li>Abrir <code>dashboard.html</code> e atualizar: o select do filtro de Origem, o select inline da tabela e o array de dados do gráfico de rosca.</li>
+  <li>Salvar e publicar.</li>
+</ol>
+
+<!-- 9. PUBLICAÇÃO GITHUB -->
+<h2>10. Publicação no GitHub Pages</h2>
+<p>O GitHub Pages serve automaticamente os arquivos da branch <code>main</code> do repositório <code>vitrucontactSales/closers-forms-uniasselvi</code>. Qualquer arquivo <code>.html</code> enviado ao repositório fica disponível publicamente na URL do projeto.</p>
+
+<h3>10.1. Publicar uma atualização (linha de comando)</h3>
+<ol>
+  <li>Navegar até a pasta do projeto: <code>cd "C:\...\Formulario_Closers_Uniasselvi"</code></li>
+  <li>Verificar o que mudou: <code>git status</code></li>
+  <li>Adicionar os arquivos modificados: <code>git add index.html dashboard.html consultor.html</code></li>
+  <li>Criar o commit: <code>git commit -m "Descrição do que foi alterado"</code></li>
+  <li>Publicar: <code>git push origin main</code></li>
+</ol>
+<div class="nota">Nota: Aguardar de 1 a 3 minutos após o push para o GitHub Pages atualizar a URL pública. Se a mudança não aparecer, pressionar Ctrl+Shift+R para limpar o cache do navegador. Alternativa: usar o GitHub Desktop (interface gráfica) para commitar e fazer o push.</div>
+
+<h3>10.2. Ativar o GitHub Pages (caso necessário)</h3>
+<ol>
+  <li>Acessar o repositório no GitHub.</li>
+  <li>Ir em Settings → Pages.</li>
+  <li>Em "Branch", selecionar <code>main</code> e pasta <code>/ (root)</code>.</li>
+  <li>Clicar em Save.</li>
+</ol>
+
+<!-- 10. TRANSFERÊNCIA -->
+<h2>11. Transferência de Responsabilidade</h2>
+
+<h3>11.1. Checklist de transferência</h3>
+<table>
+  <thead><tr><th>Item</th><th>Ação</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Supabase — acesso</td><td>Convidar novo responsável em Project Settings → Team → Invite como Owner</td><td>⬜ Pendente</td></tr>
+    <tr><td>GitHub — acesso</td><td>Adicionar novo responsável como colaborador no repositório</td><td>⬜ Pendente</td></tr>
+    <tr><td>Senha do sistema</td><td>Alterar para uma senha que o novo responsável controle</td><td>⬜ Pendente</td></tr>
+    <tr><td>Arquivos do projeto</td><td>Subir index.html, dashboard.html, consultor.html e Logo_Uniasselvi.png para o GitHub</td><td>⬜ Pendente</td></tr>
+    <tr><td>Base de colaboradores</td><td>Entregar o arquivo Base_Colaboradores_Uniasselvi.xlsx para o novo responsável</td><td>⬜ Pendente</td></tr>
+    <tr><td>Claude Code</td><td>O novo responsável pode abrir o projeto no Claude Code — o CLAUDE.md contém todo o contexto para retomar o desenvolvimento</td><td>⬜ Pendente</td></tr>
+  </tbody>
+</table>
+
+<h3>11.2. Como transferir o acesso ao GitHub</h3>
+
+<p>A conta GitHub <strong>vitrucontactSales</strong> é onde o código do sistema está hospedado. Existem duas formas de passar o controle para o novo responsável — escolha a que for mais fácil:</p>
+
+<h3>Opção A — Adicionar o novo responsável como colaborador (mais simples)</h3>
+<p>O novo responsável cria uma conta pessoal no GitHub e é adicionado ao repositório. Ele poderá publicar atualizações normalmente. A URL pública do sistema não muda.</p>
+<ol>
+  <li>Novo responsável acessa <strong>github.com</strong> e cria uma conta gratuita com o e-mail corporativo dele.</li>
+  <li>Responsável atual (ou quem tiver acesso) acessa github.com e faz login com <code>kleberson.azevedo@vitru.com.br</code> / <code>Cri@tur@1</code>.</li>
+  <li>Ir no repositório: <strong>vitrucontactSales / closers-forms-uniasselvi</strong>.</li>
+  <li>Clicar em <strong>Settings</strong> (aba no topo do repositório).</li>
+  <li>No menu à esquerda, clicar em <strong>Collaborators</strong>.</li>
+  <li>Clicar em <strong>Add people</strong> e digitar o nome de usuário ou e-mail do novo responsável.</li>
+  <li>Selecionar permissão <strong>Admin</strong> e confirmar.</li>
+  <li>O novo responsável receberá um convite por e-mail — ele precisa aceitar para ter acesso.</li>
+</ol>
+<div class="nota">Vantagem: não precisa alterar senha nem e-mail da conta atual. A URL do sistema continua a mesma. Indicado se o responsável será alguém interno com e-mail corporativo próprio.</div>
+
+<h3>Opção B — Alterar o e-mail da conta vitrucontactSales</h3>
+<p>A mesma conta GitHub passa a ser acessada pelo novo responsável, com o e-mail e senha dele. Nenhuma URL muda.</p>
+<ol>
+  <li>Novo responsável acessa <strong>github.com</strong> e faz login com <code>kleberson.azevedo@vitru.com.br</code> / <code>Cri@tur@1</code>.</li>
+  <li>Clicar na foto do perfil (canto superior direito) → <strong>Settings</strong>.</li>
+  <li>No menu à esquerda, clicar em <strong>Emails</strong>.</li>
+  <li>Em <em>"Add email address"</em>, digitar o e-mail do novo responsável e clicar em <strong>Add</strong>.</li>
+  <li>O GitHub enviará um e-mail de verificação — o novo responsável deve clicar no link recebido.</li>
+  <li>Após verificar, clicar em <strong>Primary</strong> ao lado do novo e-mail para torná-lo principal.</li>
+  <li>Remover o e-mail antigo (<code>kleberson.azevedo@vitru.com.br</code>) clicando em <strong>Remove</strong> ao lado dele.</li>
+  <li>No menu à esquerda, clicar em <strong>Password and authentication</strong> e definir uma nova senha.</li>
+</ol>
+<div class="nota">Vantagem: o novo responsável passa a ser o único dono da conta. Indicado quando se quer uma transição completa, sem dependência da conta anterior.</div>
+<div class="aviso"><strong>Atenção:</strong> Na Opção B, realize a troca de e-mail ANTES de Kleberson sair da empresa — é necessário ter acesso ao e-mail antigo para confirmar a remoção. Se o e-mail corporativo já foi desativado, use a Opção A.</div>
+
+<h3>11.3. O que NÃO precisa ser transferido</h3>
+<ul>
+  <li><strong>Dados do banco:</strong> ficam no Supabase na nuvem — acessíveis por qualquer máquina com as credenciais.</li>
+  <li><strong>Código em produção:</strong> está no GitHub Pages — acessível pela URL pública.</li>
+  <li><strong>Configurações do sistema:</strong> documentadas neste POP e no arquivo CLAUDE.md do projeto.</li>
+</ul>
+
+<!-- 11. LIMITAÇÕES -->
+<h2>12. Limitações e Pontos de Atenção</h2>
+
+<div class="nota"><strong>Autenticação simples:</strong> A proteção por senha é feita via JavaScript no front-end com hash SHA-256. Um usuário com conhecimento técnico pode contornar a verificação manipulando o sessionStorage diretamente no navegador. Para uso interno com equipe conhecida, o nível atual é adequado. Se necessário maior segurança, considerar implementar autenticação real via Supabase Auth.</div>
+
+<div class="nota"><strong>Código visível no navegador:</strong> Como toda aplicação web estática, o código HTML/JS pode ser visualizado no "Inspecionar" do Chrome. A anon key do Supabase fica visível — isso é esperado e seguro, pois as permissões reais são controladas pelas políticas RLS no banco.</div>
+
+<div class="nota"><strong>Performance com grandes volumes:</strong> O painel carrega todos os registros do banco para o navegador. Se o volume crescer significativamente, pode ser necessário implementar filtros no servidor (query parameters na API do Supabase).</div>
+
+<div class="nota"><strong>Lista de consultores hardcoded:</strong> A lista principal de 159 consultores está no código do index.html. Novos colaboradores cadastrados pelo modal ficam disponíveis imediatamente via Supabase, mas para atualizações em massa é necessário atualizar o código e publicar no GitHub.</div>
+
+<div class="nota"><strong>Sem notificações automáticas:</strong> O sistema não envia e-mails ou alertas. Toda consulta é ativa — o gestor precisa abrir o painel para ver os dados. A funcionalidade de e-mail ao cadastrar colaborador está listada como pendente de implementação.</div>
+
+<!-- 12. GLOSSÁRIO -->
+<h2>13. Glossário</h2>
+<table>
+  <thead><tr><th>Termo</th><th>Significado</th></tr></thead>
+  <tbody>
+    <tr><td>Closers</td><td>Equipe de vendas da Uniasselvi responsável pelas matrículas</td></tr>
+    <tr><td>EFETIVO / Interno</td><td>Consultor com vínculo direto com a Vitru/Uniasselvi</td></tr>
+    <tr><td>HAG</td><td>Empresa parceira de call center que vende produtos Uniasselvi (operação externa)</td></tr>
+    <tr><td>Supabase</td><td>Plataforma de banco de dados em nuvem (PostgreSQL gerenciado)</td></tr>
+    <tr><td>GitHub Pages</td><td>Serviço gratuito do GitHub para hospedar páginas HTML estáticas</td></tr>
+    <tr><td>RLS</td><td>Row Level Security — sistema de permissões por linha no PostgreSQL</td></tr>
+    <tr><td>anon key</td><td>Chave pública do Supabase usada para acesso sem autenticação de usuário</td></tr>
+    <tr><td>PostgREST</td><td>API REST automática gerada pelo Supabase sobre o banco PostgreSQL</td></tr>
+    <tr><td>sessionStorage</td><td>Armazenamento temporário no navegador, apagado ao fechar a aba</td></tr>
+    <tr><td>SHA-256</td><td>Algoritmo de hash criptográfico usado para proteger a senha do sistema</td></tr>
+    <tr><td>KPI</td><td>Key Performance Indicator — indicador-chave de desempenho</td></tr>
+    <tr><td>Autocomplete</td><td>Campo de busca que sugere opções conforme o usuário digita</td></tr>
+    <tr><td>Inline editing</td><td>Edição direta na célula da tabela, sem abrir tela separada</td></tr>
+    <tr><td>Claude Code</td><td>Ferramenta de desenvolvimento com IA usada para manutenção deste projeto</td></tr>
+    <tr><td>CLAUDE.md</td><td>Arquivo de contexto do projeto — lido automaticamente pelo Claude Code para retomar o desenvolvimento</td></tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  POP-CS-004 | Manual de Operação — Portal de Matrículas Closers Uniasselvi | Versão 1.1 | Junho/2026<br>
+  Elaborado por: Kleberson Mariano &nbsp;|&nbsp; Responsável atual: Giovana Lauer Linhares &nbsp;|&nbsp; Dúvidas técnicas: kleberson.az@gmail.com
+</div>
+
+</body>
+</html>

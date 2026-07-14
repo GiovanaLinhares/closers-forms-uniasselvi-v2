@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<title>Dashboard — Closers Uniasselvi</title>
+<link rel="icon" type="image/png" href="Logo_Uniasselvi.png">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --amarelo:   #FFD400;
+  --amarelo-d: #E6BE00;
+  --amarelo-g: rgba(255,212,0,.08);
+  --bg:        #0F0F0F;
+  --card:      #1A1A1A;
+  --card2:     #222222;
+  --input-bg:  #262626;
+  --borda:     #333333;
+  --borda-f:   #444444;
+  --txt:       #F0F0F0;
+  --txt2:      #999999;
+  --txt3:      #666666;
+  --vermelho:  #FF5555;
+  --verde:     #2ECC71;
+  --shadow:    0 4px 32px rgba(0,0,0,.5);
+  --r:         12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { overflow-x: hidden; max-width: 100vw; }
+body { font-family: 'Nunito Sans', sans-serif; background: var(--bg); min-height: 100vh; color: var(--txt); overflow-x: hidden; max-width: 100vw; }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--card); }
+::-webkit-scrollbar-thumb { background: var(--borda-f); border-radius: 3px; }
+
+/* ── Header ── */
+header {
+  background: #000;
+  padding: 0 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 68px;
+  border-bottom: 2px solid var(--amarelo);
+  position: sticky; top: 0; z-index: 100;
+}
+.logo-area { display: flex; align-items: center; gap: 14px; }
+.h-title { font-family: 'Nunito', sans-serif; color: #fff; font-size: 1.12rem; font-weight: 800; line-height: 1.2; }
+.h-sub { color: var(--amarelo); font-size: .72rem; font-weight: 700; letter-spacing: .06em; }
+.nav-links { display: flex; gap: 10px; align-items: center; }
+.nav-btn {
+  color: #000; background: var(--amarelo); border: none;
+  border-radius: 8px; padding: 8px 16px;
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .82rem;
+  cursor: pointer; transition: all .2s; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.nav-btn:hover { background: var(--amarelo-d); transform: translateY(-1px); }
+.nav-btn.ghost {
+  background: transparent; color: var(--txt2);
+  border: 1.5px solid var(--borda-f);
+}
+.nav-btn.ghost:hover { border-color: var(--amarelo); color: var(--amarelo); background: var(--amarelo-g); transform: none; }
+
+/* ── Layout ── */
+.wrapper { max-width: 1440px; width: 100%; margin: 0 auto; padding: 28px 24px 60px; }
+
+.update-bar {
+  display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+  margin-bottom: 16px; font-size: .78rem; color: var(--txt2);
+}
+.btn-atualizar {
+  background: transparent; border: 1px solid var(--borda-f); color: var(--txt);
+  padding: 5px 14px; border-radius: 8px; cursor: pointer; font-size: .78rem;
+  font-family: 'Nunito Sans', sans-serif; transition: border-color .2s, color .2s;
+}
+.btn-atualizar:hover { border-color: var(--amarelo); color: var(--amarelo); }
+.btn-atualizar.loading { opacity: .5; pointer-events: none; }
+
+/* ── KPI Cards ── */
+.kpi-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 16px; margin-bottom: 24px;
+}
+@media(max-width:900px) { .kpi-grid { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:480px) { .kpi-grid { grid-template-columns: 1fr; } }
+
+.kpi-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: var(--r); padding: 20px 22px;
+  position: relative; overflow: hidden;
+}
+.kpi-card::after {
+  content: ''; position: absolute; bottom: -24px; right: -24px;
+  width: 90px; height: 90px; border-radius: 50%;
+  background: var(--amarelo-g);
+}
+.kpi-icon { position: absolute; top: 18px; right: 20px; font-size: 1.4rem; opacity: .5; }
+.kpi-label {
+  font-size: .7rem; font-weight: 700; color: var(--txt2);
+  text-transform: uppercase; letter-spacing: .07em; margin-bottom: 8px;
+}
+.kpi-value {
+  font-family: 'Nunito', sans-serif; font-size: 2.4rem;
+  font-weight: 800; line-height: 1; color: var(--txt);
+}
+.kpi-card.k-total  { border-top: 3px solid var(--amarelo); }
+.kpi-card.k-pago   { border-top: 3px solid #2ECC71; }
+.kpi-card.k-aguard { border-top: 3px solid #F59E0B; }
+.kpi-card.k-contra { border-top: 3px solid #3B82F6; }
+.v-pago   { color: #2ECC71 !important; }
+.v-aguard { color: #F59E0B !important; }
+.v-contra { color: #3B82F6 !important; }
+
+/* ── Filters ── */
+.filters {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: var(--r); padding: 16px 20px;
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+  margin-bottom: 24px;
+}
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fg label {
+  font-size: .68rem; font-weight: 700; color: var(--txt3);
+  text-transform: uppercase; letter-spacing: .06em;
+}
+.fctrl {
+  padding: 8px 12px; border: 1.5px solid var(--borda);
+  border-radius: 8px; font-family: 'Nunito Sans', sans-serif;
+  font-size: .84rem; color: var(--txt); background: var(--input-bg);
+  appearance: none; -webkit-appearance: none; min-width: 150px;
+  transition: border-color .2s;
+}
+.fctrl:focus { outline: none; border-color: var(--amarelo); }
+.fctrl option { background: #2A2A2A; }
+.fctrl[type="date"] { min-width: 130px; }
+
+/* Autocomplete filtro consultor */
+.fac-wrap { position: relative; }
+.fac-dropdown {
+  display: none; position: absolute; top: calc(100% + 3px); left: 0; right: 0;
+  background: var(--card2); border: 1.5px solid var(--amarelo); border-radius: 8px;
+  max-height: 200px; overflow-y: auto; z-index: 300;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5); min-width: 220px;
+}
+.fac-item {
+  padding: 8px 14px; cursor: pointer; font-size: .82rem; color: var(--txt);
+  border-bottom: 1px solid var(--borda); transition: background .1s;
+}
+.fac-item:last-child { border-bottom: none; }
+.fac-item:hover, .fac-item.ativo { background: #1C1800; color: var(--amarelo); font-weight: 700; }
+.fac-nenhum { padding: 10px 14px; font-size: .8rem; color: var(--txt3); text-align: center; }
+.btn-reset {
+  padding: 9px 16px; border-radius: 8px;
+  border: 1.5px solid var(--borda-f); background: transparent;
+  color: var(--txt2); font-family: 'Nunito', sans-serif;
+  font-weight: 700; font-size: .8rem; cursor: pointer; transition: all .2s;
+  align-self: flex-end;
+}
+.btn-reset:hover { border-color: var(--vermelho); color: var(--vermelho); }
+
+/* ── Charts ── */
+.charts-grid {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 16px; margin-bottom: 24px;
+}
+@media(max-width:1000px) { .charts-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:600px)  { .charts-grid { grid-template-columns: 1fr; } }
+
+.chart-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: var(--r); padding: 20px 22px;
+}
+.chart-title {
+  font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .78rem;
+  color: var(--txt2); text-transform: uppercase; letter-spacing: .07em;
+  margin-bottom: 16px;
+}
+.chart-wrap { position: relative; height: 260px; }
+
+/* ── Table ── */
+.table-card {
+  background: var(--card); border: 1px solid var(--borda);
+  border-radius: var(--r); overflow: hidden; min-width: 0; width: 100%;
+}
+.table-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--borda);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--card2);
+}
+.table-head-title { font-family: 'Nunito', sans-serif; font-weight: 800; font-size: .92rem; }
+.table-count { font-size: .78rem; color: var(--txt2); }
+.table-wrap { overflow-x: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: .81rem; }
+thead th {
+  padding: 10px 14px; text-align: left;
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: .68rem;
+  color: var(--txt3); text-transform: uppercase; letter-spacing: .06em;
+  border-bottom: 1px solid var(--borda); white-space: nowrap;
+  background: #141414; position: sticky; top: 0;
+}
+tbody tr { border-bottom: 1px solid var(--borda); transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.025); }
+tbody td { padding: 9px 14px; color: var(--txt); vertical-align: middle; white-space: nowrap; }
+.td-polo { white-space: normal; max-width: 200px; font-size: .76rem; color: var(--txt2); }
+.td-num { color: var(--txt3); font-size: .76rem; }
+.td-candidato { font-family: 'Nunito', sans-serif; font-weight: 700; }
+.td-dim { color: var(--txt2); }
+.canal-tipo { padding: 3px 10px; border-radius: 12px; font-size: .72rem; font-weight: 700; font-family: 'Nunito', sans-serif; white-space: nowrap; }
+.ct-interno { background: rgba(59,130,246,.15); color: #3B82F6; }
+.ct-hag     { background: rgba(245,158,11,.15);  color: #F59E0B; }
+.td-ts { color: var(--txt3); font-size: .74rem; }
+
+/* ── Status select inline ── */
+.ssel {
+  padding: 5px 26px 5px 10px; border-radius: 20px;
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: .74rem;
+  border: none; cursor: pointer; outline: none;
+  appearance: none; -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  transition: opacity .2s; min-width: 170px;
+}
+.ssel:disabled { opacity: .45; cursor: not-allowed; }
+.ssel option { background: #2A2A2A; color: #f0f0f0; }
+.s-pago        { background: rgba(46,204,113,.18);  color: #2ECC71; }
+.s-aguard      { background: rgba(245,158,11,.18);  color: #F59E0B; }
+.s-contra      { background: rgba(59,130,246,.18);  color: #3B82F6; }
+.s-antecipado  { background: rgba(6,182,212,.18);   color: #06B6D4; }
+.s-atrasado    { background: rgba(255,85,85,.18);   color: #FF5555; }
+
+/* ── Auditoria ── */
+.ssel-audit { min-width: 160px; }
+.ssel-origem { min-width: 130px; background-color: rgba(255,255,255,.05); }
+.s-audit-ok   { background: rgba(46,204,113,.15); color: #2ECC71; }
+.s-audit-erro { background: rgba(255,85,85,.15);  color: #FF5555; }
+.s-audit-pend { background: rgba(100,100,100,.15); color: #888; }
+.obs-audit {
+  margin-top: 6px; width: 100%; padding: 6px 10px;
+  border: 1.5px solid #FF5555; border-radius: 8px;
+  background: #1A0000; color: var(--txt); font-size: .78rem;
+  font-family: 'Nunito Sans', sans-serif; resize: vertical; min-height: 52px;
+}
+.obs-audit:focus { outline: none; box-shadow: 0 0 0 2px rgba(255,85,85,.25); }
+
+/* ── Toast ── */
+.toast {
+  position: fixed; bottom: 28px; right: 28px;
+  padding: 12px 20px; border-radius: 10px;
+  font-family: 'Nunito', sans-serif; font-weight: 700; font-size: .88rem;
+  box-shadow: 0 6px 24px rgba(0,0,0,.4);
+  transform: translateY(100px); opacity: 0;
+  transition: all .35s cubic-bezier(.34,1.56,.64,1); z-index: 999;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+.msg-estado { text-align: center; padding: 48px 20px; color: var(--txt3); font-size: .88rem; }
+
+.data-pag-ctrl {
+  padding: 4px 8px; border: 1.5px solid var(--borda-f);
+  border-radius: 6px; background: var(--input-bg); color: var(--txt);
+  font-size: .76rem; font-family: 'Nunito Sans', sans-serif;
+  transition: border-color .2s;
+}
+.data-pag-ctrl:focus { outline: none; border-color: var(--amarelo); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-area">
+    <img src="Logo_Uniasselvi.png" width="42" height="42" style="border-radius:6px;object-fit:contain;" alt="Uniasselvi">
+    <div>
+      <div class="h-title">Uniasselvi</div>
+      <div class="h-sub">CLOSERS · DASHBOARD</div>
+    </div>
+  </div>
+  <div class="nav-links">
+    <button onclick="exportarCSV()" class="nav-btn ghost">⬇ Exportar CSV</button>
+    <a href="index.html" class="nav-btn ghost">← Formulário</a>
+    <button onclick="sair()" class="nav-btn ghost">Sair</button>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <!-- Barra de atualização -->
+  <div class="update-bar">
+    <span id="ultimaAtualizacao">Carregando...</span>
+    <button class="btn-atualizar" id="btnAtualizar" onclick="atualizarDados()">↻ Atualizar</button>
+  </div>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card k-total">
+      <span class="kpi-icon">📋</span>
+      <div class="kpi-label">Atuação de Boleto</div>
+      <div class="kpi-value" id="kpiTotal">—</div>
+    </div>
+    <div class="kpi-card k-pago">
+      <span class="kpi-icon">✅</span>
+      <div class="kpi-label">Pagas</div>
+      <div class="kpi-value v-pago" id="kpiPago">—</div>
+    </div>
+    <div class="kpi-card k-aguard">
+      <span class="kpi-icon">⏳</span>
+      <div class="kpi-label">Aguardando Pagamento</div>
+      <div class="kpi-value v-aguard" id="kpiAguard">—</div>
+    </div>
+    <div class="kpi-card k-contra">
+      <span class="kpi-icon">📊</span>
+      <div class="kpi-label">Taxa de Conversão</div>
+      <div class="kpi-value v-contra" id="kpiContra">—</div>
+    </div>
+  </div>
+
+  <!-- Filtros -->
+  <div class="filters">
+    <div class="fg">
+      <label>Gestor(a)</label>
+      <select class="fctrl" id="fGestor" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option>Beatriz Ferrari Jordão</option>
+        <option>Sandoval Eduardo Nazareth Souza</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Consultor(a)</label>
+      <div class="fac-wrap">
+        <input class="fctrl" type="text" id="fConsultorBusca"
+               placeholder="Buscar consultor..."
+               autocomplete="off"
+               oninput="filtrarFConsultor()"
+               onfocus="abrirFConsultor()"
+               onkeydown="navFConsultor(event)"
+               style="padding-right:10px">
+        <div class="fac-dropdown" id="fConsultorDrop"></div>
+      </div>
+      <input type="hidden" id="fConsultor">
+    </div>
+    <div class="fg">
+      <label>Status</label>
+      <select class="fctrl" id="fStatus" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option>Aguardando Pagamento</option>
+        <option>Pago na data do vencimento</option>
+        <option>Boleto Pago Antecipado</option>
+        <option>Pagamento – Atrasado</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Canal</label>
+      <select class="fctrl" id="fCanal" onchange="aplicarFiltros()">
+        <option value="">Todos</option>
+        <option>Interno</option>
+        <option>Hag</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Modalidade</label>
+      <select class="fctrl" id="fModalidade" onchange="aplicarFiltros()">
+        <option value="">Todas</option>
+        <option>Graduação EAD</option>
+        <option>Ed. Continuada — Pós Graduação</option>
+        <option>Ed. Continuada — Profissionalizante</option>
+        <option>Ed. Continuada — Técnico</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Origem</label>
+      <select class="fctrl" id="fOrigem" onchange="aplicarFiltros()">
+        <option value="">Todas</option>
+        <option>Contact Center</option>
+        <option>Leo App/Web</option>
+        <option>Polo</option>
+        <option>Externo</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>De</label>
+      <input type="date" class="fctrl" id="fDe" onchange="aplicarFiltros()">
+    </div>
+    <div class="fg">
+      <label>Até</label>
+      <input type="date" class="fctrl" id="fAte" onchange="aplicarFiltros()">
+    </div>
+    <button class="btn-reset" onclick="limparFiltros()">✕ Limpar filtros</button>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-title">Matrículas por Consultor</div>
+      <div class="chart-wrap"><canvas id="chartConsultor"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Interno vs HAG</div>
+      <div class="chart-wrap"><canvas id="chartCanal"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Distribuição por Status</div>
+      <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Origem da Matrícula</div>
+      <div class="chart-wrap"><canvas id="chartOrigem"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Tabela -->
+  <div class="table-card">
+    <div class="table-head">
+      <span class="table-head-title">Registros</span>
+      <span class="table-count" id="tableCount">—</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Consultor(a)</th>
+            <th>Origem</th>
+            <th>Candidato</th>
+            <th>Data Atend.</th>
+            <th>Ticket</th>
+            <th>Canal</th>
+            <th>Polo</th>
+            <th>Modalidade</th>
+            <th>Gestor(a)</th>
+            <th>Status</th>
+            <th>Data Pagamento</th>
+            <th>Auditoria</th>
+            <th>Registrado Em</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="14" class="msg-estado">Carregando dados...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script>
+Chart.register(ChartDataLabels);
+
+const SUPABASE_URL  = 'https://wfequjtoutpqvfyjdrvo.supabase.co';
+const SUPABASE_KEY  = 'sb_publishable_NYXnlMO9SZc4Sg3zxPCZtw_Uto0gecQ';
+
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function doughnutDatalabels(dataArr) {
+  const total = dataArr.reduce((s, v) => s + v, 0);
+  return {
+    color: '#fff',
+    font: { weight: 'bold', size: 12 },
+    textAlign: 'center',
+    formatter: (value) => {
+      if (!value) return '';
+      const pct = total ? Math.round(value / total * 100) : 0;
+      return `${value}\n(${pct}%)`;
+    },
+    display: (ctx) => ctx.dataset.data[ctx.dataIndex] > 0
+  };
+}
+
+// Proteção de acesso
+if (sessionStorage.getItem('dash_auth') !== '1') {
+  window.location.href = 'index.html';
+}
+
+let todosRegistros   = [];
+let chartConsulInst  = null;
+let chartStatusInst  = null;
+let chartCanalInst   = null;
+let chartOrigemInst  = null;
+
+// ── Toast ──
+function toast(msg, cor = '#2ECC71') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.background = cor;
+  el.style.color = (cor === '#2ECC71') ? '#000' : '#fff';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ── Formatação ──
+function fmtData(d) {
+  if (!d) return '—';
+  const [y, m, dia] = d.split('-');
+  return `${dia}/${m}/${y}`;
+}
+function fmtDataHora(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleString('pt-BR', {
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit'
+  });
+}
+
+// ── Classe do status ──
+function sClass(s) {
+  if (s === 'Pago na data do vencimento' || s === 'Pago' || s === 'Boleto Pago Antecipado') return 's-pago';
+  if (s === 'Aguardando Pagamento')                   return 's-aguard';
+  if (s === 'Boleto pago - Antecipado')               return 's-antecipado';
+  if (s === 'Pagamento – Atrasado')                   return 's-atrasado';
+  if (s === 'Contrato Gerado')                        return 's-contra';
+  return 's-aguard';
+}
+
+// Gera as options do select de status para o analista
+function statusOpts(current) {
+  const opts = [
+    'Aguardando Pagamento',
+    'Pago na data do vencimento',
+    'Boleto Pago Antecipado',
+    'Pagamento – Atrasado'
+  ];
+  let html = '';
+  if (current && !opts.includes(current)) {
+    html += `<option value="${current}" selected>${current}</option>`;
+  }
+  opts.forEach(o => {
+    html += `<option value="${o}" ${current === o ? 'selected' : ''}>${o}</option>`;
+  });
+  return html;
+}
+
+function tevePagamento(s) {
+  return s && s !== 'Aguardando Pagamento';
+}
+
+// ── Carregar dados do Supabase ──
+async function carregar() {
+  const TAMANHO_PAGINA = 1000;
+  let todos = [];
+  let pagina = 0;
+
+  while (true) {
+    const inicio = pagina * TAMANHO_PAGINA;
+    const fim = inicio + TAMANHO_PAGINA - 1;
+    const { data, error } = await db
+      .from('matriculas')
+      .select('*')
+      .order('id', { ascending: false })
+      .range(inicio, fim);
+
+    if (error) {
+      document.getElementById('tbody').innerHTML =
+        `<tr><td colspan="14" class="msg-estado">❌ Erro ao carregar dados. Verifique a conexão.</td></tr>`;
+      return;
+    }
+
+    todos = todos.concat(data || []);
+
+    if (!data || data.length < TAMANHO_PAGINA) break;
+    pagina++;
+  }
+
+  todosRegistros = todos;
+  popularFiltroConsultor();
+  aplicarFiltros();
+
+  const agora = new Date().toLocaleString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+  document.getElementById('ultimaAtualizacao').textContent = `Última atualização: ${agora}`;
+}
+
+async function atualizarDados() {
+  const btn = document.getElementById('btnAtualizar');
+  btn.textContent = '↻ Atualizando...';
+  btn.classList.add('loading');
+  await carregar();
+  btn.textContent = '↻ Atualizar';
+  btn.classList.remove('loading');
+}
+
+// ── Autocomplete filtro consultor ──
+let _fConsultorNomes = [];
+let _fConsultorAtivo = -1;
+
+function popularFiltroConsultor() {
+  _fConsultorNomes = [...new Set(todosRegistros.map(r => r.consultor).filter(Boolean))]
+    .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  // legado — mantido para não quebrar chamadas existentes
+  const sel = { appendChild: () => {} }; // no-op
+  const nomes = _fConsultorNomes;
+  nomes.forEach(n => {
+    const o = document.createElement('option');
+    o.value = o.textContent = n;
+    sel.appendChild(o);
+  });
+}
+
+function filtrarFConsultor() {
+  document.getElementById('fConsultor').value = '';
+  const q    = document.getElementById('fConsultorBusca').value.toLowerCase().trim();
+  const drop = document.getElementById('fConsultorDrop');
+  _fConsultorAtivo = -1;
+  if (!q) { drop.style.display = 'none'; aplicarFiltros(); return; }
+  const matches = _fConsultorNomes.filter(n => n.toLowerCase().includes(q));
+  drop.innerHTML = matches.length
+    ? matches.map(n => `<div class="fac-item" onclick="selecionarFConsultor('${n.replace(/'/g,"\\'")}') ">${n}</div>`).join('')
+    : '<div class="fac-nenhum">Nenhum resultado.</div>';
+  drop.style.display = 'block';
+}
+
+function abrirFConsultor() {
+  if (document.getElementById('fConsultorBusca').value.trim()) filtrarFConsultor();
+}
+
+function selecionarFConsultor(val) {
+  document.getElementById('fConsultorBusca').value = val;
+  document.getElementById('fConsultor').value = val;
+  document.getElementById('fConsultorDrop').style.display = 'none';
+  aplicarFiltros();
+}
+
+function navFConsultor(e) {
+  const items = document.querySelectorAll('#fConsultorDrop .fac-item');
+  if (!items.length) return;
+  if (e.key === 'ArrowDown') _fConsultorAtivo = Math.min(_fConsultorAtivo + 1, items.length - 1);
+  else if (e.key === 'ArrowUp') _fConsultorAtivo = Math.max(_fConsultorAtivo - 1, 0);
+  else if (e.key === 'Enter' && _fConsultorAtivo >= 0) {
+    e.preventDefault();
+    selecionarFConsultor(items[_fConsultorAtivo].textContent.trim());
+    return;
+  } else if (e.key === 'Escape') {
+    document.getElementById('fConsultorDrop').style.display = 'none'; return;
+  } else return;
+  items.forEach((el, i) => el.classList.toggle('ativo', i === _fConsultorAtivo));
+  items[_fConsultorAtivo]?.scrollIntoView({ block: 'nearest' });
+}
+
+// ── Filtros ──
+function getFiltrado() {
+  const fG  = document.getElementById('fGestor').value;
+  const fC  = document.getElementById('fConsultor').value;
+  const fS  = document.getElementById('fStatus').value;
+  const fCa = document.getElementById('fCanal').value;
+  const fM  = document.getElementById('fModalidade').value;
+  const fOr = document.getElementById('fOrigem').value;
+  const fDe = document.getElementById('fDe').value;
+  const fAt = document.getElementById('fAte').value;
+
+  return todosRegistros.filter(r => {
+    if (fG  && r.gestor            !== fG)  return false;
+    if (fC  && r.consultor         !== fC)  return false;
+    if (fS  && r.status            !== fS)  return false;
+    if (fCa && r.canal_atendimento !== fCa) return false;
+    if (fM  && r.modalidade        !== fM)  return false;
+    if (fOr && r.origem_matricula  !== fOr) return false;
+    if (fDe && r.data_atendimento  <  fDe)  return false;
+    if (fAt && r.data_atendimento  >  fAt)  return false;
+    return true;
+  });
+}
+
+function aplicarFiltros() {
+  const filtrado = getFiltrado();
+  atualizarKPIs(filtrado);
+  atualizarGraficos(filtrado);
+  renderTabela(filtrado);
+}
+
+// ── Atualizar data de pagamento inline ──
+async function atualizarDataPagamento(input) {
+  const id   = input.dataset.id;
+  const data = input.value || null;
+
+  const { error } = await db
+    .from('matriculas')
+    .update({ data_pagamento: data })
+    .eq('id', id);
+
+  if (error) { toast('Erro ao salvar data.', '#FF5555'); return; }
+
+  const reg = todosRegistros.find(r => r.id === id);
+  if (reg) reg.data_pagamento = data;
+
+  toast('✔ Data de pagamento salva!');
+}
+
+function limparFiltros() {
+  ['fGestor','fStatus','fCanal','fModalidade','fOrigem','fDe','fAte']
+    .forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fConsultor').value      = '';
+  document.getElementById('fConsultorBusca').value = '';
+  document.getElementById('fConsultorDrop').style.display = 'none';
+  aplicarFiltros();
+}
+
+// ── KPIs ──
+function atualizarKPIs(d) {
+  const total  = d.length;
+  const pagos  = d.filter(r => tevePagamento(r.status)).length;
+  document.getElementById('kpiTotal').textContent  = total;
+  document.getElementById('kpiPago').textContent   = pagos;
+  document.getElementById('kpiAguard').textContent = d.filter(r => r.status === 'Aguardando Pagamento').length;
+  document.getElementById('kpiContra').textContent = total > 0 ? Math.round((pagos / total) * 100) + '%' : '—';
+}
+
+// ── Gráficos ──
+function atualizarGraficos(d) {
+  // Matrículas por consultor (top 15)
+  const porConsultor = {};
+  d.forEach(r => {
+    const k = (r.consultor || 'Sem nome').split(' ')[0];
+    porConsultor[k] = (porConsultor[k] || 0) + 1;
+  });
+  const cLabels = Object.keys(porConsultor)
+    .sort((a, b) => porConsultor[b] - porConsultor[a])
+    .slice(0, 15);
+  const cData = cLabels.map(k => porConsultor[k]);
+
+  if (chartConsulInst) chartConsulInst.destroy();
+  chartConsulInst = new Chart(document.getElementById('chartConsultor'), {
+    type: 'bar',
+    data: {
+      labels: cLabels,
+      datasets: [{ data: cData, backgroundColor: '#FFD400', borderRadius: 5, borderSkipped: false }]
+    },
+    options: {
+      indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, datalabels: { display: false } },
+      scales: {
+        x: { ticks: { color: '#666', font: { size: 11 } }, grid: { color: '#222' } },
+        y: { ticks: { color: '#bbb', font: { size: 11 } }, grid: { display: false } }
+      }
+    }
+  });
+
+  // Distribuição por status
+  const sData = [
+    d.filter(r => r.status === 'Boleto pago - Antecipado' || r.status === 'Boleto Pago Antecipado').length,
+    d.filter(r => r.status === 'Aguardando Pagamento').length,
+    d.filter(r => r.status === 'Pagamento – Atrasado').length,
+    d.filter(r => r.status === 'Pago na data do vencimento' || r.status === 'Pago').length,
+  ];
+  if (chartStatusInst) chartStatusInst.destroy();
+  chartStatusInst = new Chart(document.getElementById('chartStatus'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Antecipado', 'Aguardando Pagamento', 'Atrasado', 'Pago'],
+      datasets: [{
+        data: sData,
+        backgroundColor: ['#06B6D4', '#F59E0B', '#FF5555', '#2ECC71'],
+        borderColor: '#1A1A1A', borderWidth: 3, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
+        },
+        datalabels: doughnutDatalabels(sData)
+      }
+    }
+  });
+
+  // Interno vs HAG
+  const interno = d.filter(r => r.canal_consultor === 'Interno' || (!r.canal_consultor && r.canal_atendimento === 'Interno')).length;
+  const hag     = d.filter(r => r.canal_consultor === 'HAG'     || (!r.canal_consultor && r.canal_atendimento === 'Hag')).length;
+  if (chartCanalInst) chartCanalInst.destroy();
+  chartCanalInst = new Chart(document.getElementById('chartCanal'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Interno', 'HAG'],
+      datasets: [{
+        data: [interno, hag],
+        backgroundColor: ['#3B82F6', '#F59E0B'],
+        borderColor: '#1A1A1A', borderWidth: 3, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
+        },
+        datalabels: doughnutDatalabels([interno, hag])
+      }
+    }
+  });
+
+  const cc     = d.filter(r => r.origem_matricula === 'Contact Center').length;
+  const leo    = d.filter(r => r.origem_matricula === 'Leo App/Web').length;
+  const polo   = d.filter(r => r.origem_matricula === 'Polo').length;
+  const externo= d.filter(r => r.origem_matricula === 'Externo').length;
+
+  if (chartOrigemInst) chartOrigemInst.destroy();
+  chartOrigemInst = new Chart(document.getElementById('chartOrigem'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Contact Center', 'Leo App/Web', 'Polo', 'Externo'],
+      datasets: [{
+        data: [cc, leo, polo, externo],
+        backgroundColor: ['#10B981', '#8B5CF6', '#F59E0B', '#3B82F6'],
+        borderColor: '#1A1A1A', borderWidth: 3, hoverOffset: 6
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '62%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#bbb', padding: 14, font: { size: 11 }, boxWidth: 12 }
+        },
+        datalabels: doughnutDatalabels([cc, leo, polo, externo])
+      }
+    }
+  });
+}
+
+// ── Tabela ──
+function renderTabela(d) {
+  const tbody = document.getElementById('tbody');
+  document.getElementById('tableCount').textContent =
+    `${d.length} registro${d.length !== 1 ? 's' : ''}`;
+
+  if (!d.length) {
+    tbody.innerHTML = `<tr><td colspan="14" class="msg-estado">Nenhum registro encontrado.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = d.map((r, i) => `
+    <tr>
+      <td class="td-num">${i + 1}</td>
+      <td>${r.consultor || '—'}</td>
+      <td>
+        <select class="ssel ssel-origem"
+                data-id="${r.id}"
+                data-orig="${r.origem_matricula || ''}"
+                onchange="atualizarOrigem(this)">
+          <option value="" ${!r.origem_matricula ? 'selected' : ''}>—</option>
+          <option value="Contact Center" ${r.origem_matricula === 'Contact Center' ? 'selected' : ''}>Contact Center</option>
+          <option value="Leo App/Web" ${r.origem_matricula === 'Leo App/Web' ? 'selected' : ''}>Leo App/Web</option>
+          <option value="Polo" ${r.origem_matricula === 'Polo' ? 'selected' : ''}>Polo</option>
+          <option value="Externo" ${r.origem_matricula === 'Externo' ? 'selected' : ''}>Externo</option>
+        </select>
+      </td>
+      <td class="td-candidato">${r.candidato || '—'}</td>
+      <td>${fmtData(r.data_atendimento)}</td>
+      <td class="td-dim">${r.ticket || '—'}</td>
+      <td>${r.canal_atendimento || '—'}</td>
+      <td class="td-polo">${r.polo || '—'}</td>
+      <td class="td-dim">${r.modalidade || '—'}</td>
+      <td class="td-dim">${r.gestor || '—'}</td>
+      <td>
+        <select class="ssel ${sClass(r.status)}"
+                data-id="${r.id}"
+                data-orig="${r.status || ''}"
+                onchange="atualizarStatus(this)">
+          ${statusOpts(r.status)}
+        </select>
+      </td>
+      <td id="dpag-${r.id}">
+        ${tevePagamento(r.status)
+          ? `<input type="date" class="data-pag-ctrl" value="${r.data_pagamento || ''}" data-id="${r.id}" onchange="atualizarDataPagamento(this)">`
+          : '—'}
+      </td>
+      <td id="audit-${r.id}" style="min-width:180px">
+        <select class="ssel ssel-audit ${auditClass(r.status_auditoria)}"
+                data-id="${r.id}"
+                onchange="atualizarAuditoria(this)">
+          <option value="" ${!r.status_auditoria ? 'selected' : ''}>— Pendente —</option>
+          <option value="Auditoria Feita - ok" ${r.status_auditoria === 'Auditoria Feita - ok' ? 'selected' : ''}>Auditoria Feita - ok</option>
+          <option value="Erro" ${r.status_auditoria === 'Erro' ? 'selected' : ''}>Erro</option>
+        </select>
+        ${r.status_auditoria === 'Erro'
+          ? `<textarea class="obs-audit" placeholder="Descreva o erro..." data-id="${r.id}" onblur="salvarObsAuditoria(this)">${r.obs_auditoria || ''}</textarea>`
+          : ''}
+      </td>
+      <td class="td-ts">${fmtDataHora(r.registrado_em)}</td>
+    </tr>
+  `).join('');
+}
+
+// ── Atualizar status inline ──
+async function atualizarStatus(sel) {
+  const id        = sel.dataset.id;
+  const novoStatus= sel.value;
+  const original  = sel.dataset.orig;
+
+  sel.disabled = true;
+
+  const { error } = await db
+    .from('matriculas')
+    .update({ status: novoStatus })
+    .eq('id', id);
+
+  sel.disabled = false;
+
+  if (error) {
+    sel.value     = original;
+    sel.className = `ssel ${sClass(original)}`;
+    toast('Erro ao atualizar status.', '#FF5555');
+    return;
+  }
+
+  // Atualiza registro local
+  const reg = todosRegistros.find(r => r.id === id);
+  if (reg) reg.status = novoStatus;
+
+  sel.className    = `ssel ${sClass(novoStatus)}`;
+  sel.dataset.orig = novoStatus;
+
+  // Mostra/esconde input de data pagamento
+  const cell = document.getElementById(`dpag-${id}`);
+  if (cell) {
+    if (tevePagamento(novoStatus)) {
+      cell.innerHTML = `<input type="date" class="data-pag-ctrl" value="${reg?.data_pagamento || ''}" data-id="${id}" onchange="atualizarDataPagamento(this)">`;
+    } else {
+      cell.innerHTML = '—';
+      db.from('matriculas').update({ data_pagamento: null }).eq('id', id);
+      if (reg) reg.data_pagamento = null;
+    }
+  }
+
+  // Atualiza KPIs e gráficos sem recriar a tabela
+  const filtrado = getFiltrado();
+  atualizarKPIs(filtrado);
+  atualizarGraficos(filtrado);
+
+  toast('✔ Status atualizado!');
+}
+
+// ── Origem editável ──
+async function atualizarOrigem(sel) {
+  const id       = sel.dataset.id;
+  const novaOrigem = sel.value;
+  const original = sel.dataset.orig;
+
+  sel.disabled = true;
+
+  const { error } = await db
+    .from('matriculas')
+    .update({ origem_matricula: novaOrigem || null })
+    .eq('id', id);
+
+  sel.disabled = false;
+
+  if (error) {
+    sel.value = original;
+    toast('Erro ao atualizar origem.', '#FF5555');
+    return;
+  }
+
+  const reg = todosRegistros.find(r => r.id === id);
+  if (reg) reg.origem_matricula = novaOrigem;
+  sel.dataset.orig = novaOrigem;
+
+  const filtrado = getFiltrado();
+  atualizarKPIs(filtrado);
+  atualizarGraficos(filtrado);
+
+  toast('✔ Origem atualizada!');
+}
+
+// ── Auditoria ──
+function auditClass(s) {
+  if (s === 'Auditoria Feita - ok') return 's-audit-ok';
+  if (s === 'Erro')                 return 's-audit-erro';
+  return 's-audit-pend';
+}
+
+async function atualizarAuditoria(sel) {
+  const id     = sel.dataset.id;
+  const novo   = sel.value;
+  const cell   = document.getElementById(`audit-${id}`);
+
+  sel.disabled = true;
+  const { error } = await db.from('matriculas').update({ status_auditoria: novo || null }).eq('id', id);
+  sel.disabled = false;
+
+  if (error) { toast('Erro ao salvar auditoria.', '#FF5555'); return; }
+
+  const reg = todosRegistros.find(r => r.id === id);
+  if (reg) reg.status_auditoria = novo;
+
+  sel.className = `ssel ssel-audit ${auditClass(novo)}`;
+
+  // Mostra/esconde textarea de observação
+  let ta = cell.querySelector('textarea.obs-audit');
+  if (novo === 'Erro') {
+    if (!ta) {
+      ta = document.createElement('textarea');
+      ta.className   = 'obs-audit';
+      ta.placeholder = 'Descreva o erro...';
+      ta.dataset.id  = id;
+      ta.textContent = reg?.obs_auditoria || '';
+      ta.addEventListener('blur', () => salvarObsAuditoria(ta));
+      cell.appendChild(ta);
+    }
+  } else {
+    if (ta) {
+      ta.remove();
+      await db.from('matriculas').update({ obs_auditoria: null }).eq('id', id);
+      if (reg) reg.obs_auditoria = null;
+    }
+  }
+
+  toast('✔ Auditoria atualizada!');
+}
+
+async function salvarObsAuditoria(ta) {
+  const id  = ta.dataset.id;
+  const obs = ta.value.trim();
+  const { error } = await db.from('matriculas').update({ obs_auditoria: obs || null }).eq('id', id);
+  if (error) { toast('Erro ao salvar observação.', '#FF5555'); return; }
+  const reg = todosRegistros.find(r => r.id === id);
+  if (reg) reg.obs_auditoria = obs;
+}
+
+// ── Exportar CSV ──
+function exportarCSV() {
+  const filtrado = getFiltrado();
+  if (!filtrado.length) { toast('Nenhum dado para exportar.', '#F59E0B'); return; }
+
+  const cols = ['origem_matricula','consultor','canal_consultor','candidato','data_atendimento','ticket','canal_atendimento','polo','modalidade','gestor','status','data_pagamento','observacoes','status_auditoria','obs_auditoria','registrado_em'];
+  const cabecalho = ['Origem','Consultor','Tipo Consultor','Candidato','Data Atendimento','Ticket','Canal Atendimento','Polo','Modalidade','Gestor','Status','Data Pagamento','Observações','Auditoria','Obs. Auditoria','Registrado Em'];
+
+  const linhas = filtrado.map(r =>
+    cols.map(c => `"${String(r[c] || '').replace(/"/g, '""')}"`).join(',')
+  );
+
+  const csv  = '﻿' + cabecalho.join(',') + '\n' + linhas.join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `matriculas_closers_${new Date().toLocaleDateString('pt-BR').replace(/\//g,'-')}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Sair ──
+function sair() {
+  sessionStorage.removeItem('dash_auth');
+  window.location.href = 'index.html';
+}
+
+// Init
+carregar();
+</script>
+</body>
+</html>
