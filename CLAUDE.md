@@ -102,6 +102,15 @@ GRANT UPDATE ON public.matriculas TO anon;
 **URL pública:** `https://vitrucontactsales.github.io/closers-forms-uniasselvi/`
 **Arquivos publicados:** `index.html`, `dashboard.html`, `Logo_Uniasselvi.png`
 
+### Cópia do repositório (backup em outra conta)
+
+**Conta:** `GiovanaLinhares`
+**Repositório:** `GiovanaLinhares/closers-forms-uniasselvi-v2`
+**URL pública:** `https://giovanalinhares.github.io/closers-forms-uniasselvi-v2/`
+**GitHub Pages:** habilitado manualmente (Deploy from a branch → `main` → `/root`)
+
+> Cópia espelho criada em 14/07/2026 a partir do repositório original, para fins de backup. O repositório original (`vitrucontactSales`) continua ativo e é a fonte principal — atualizações futuras precisam ser replicadas manualmente nos dois repositórios.
+
 ---
 
 ## Identidade Visual — Uniasselvi
@@ -274,5 +283,9 @@ Botão no header exporta todos os registros filtrados com todos os campos.
 - [x] Rótulos fixos nos gráficos de rosca (valor + %) via chartjs-plugin-datalabels
 - [x] KPI "Total de Matrículas" renomeado para "Atuação de Boleto"
 - [x] Barra de última atualização + botão Atualizar no topo do dashboard
+- [x] Paginação em blocos no `carregar()` do dashboard — corrige teto de 1000 registros (limite padrão do PostgREST/Supabase)
+- [x] Polo "Goiana/PE" adicionado ao select de Polo do `index.html`
+- [x] Polos "Guaratinguetá/SP" e "Ilhota/SC" adicionados ao select de Polo do `index.html`
+- [x] Cópia de backup do repositório publicada em `GiovanaLinhares/closers-forms-uniasselvi-v2`
 - [ ] Email de notificação ao cadastrar colaborador — Supabase Edge Function + Resend
 - [ ] Publicar no GitHub Pages
